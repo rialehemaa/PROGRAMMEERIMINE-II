@@ -22,49 +22,51 @@ namespace KolmRakendust
 
         public void GeneraeriUus()
         {
-            switch (Tehe)
+            if (Tehe == '+')
             {
-                case '+':
-                    {
-                        // tuutoriali muster: mõlemad liidetavad ühe Next() kutsega
-                        int maxLiidetav = tase == 0 ? 20 : (tase == 1 ? 100 : 999);
-                        A = rnd.Next(maxLiidetav + 1);
-                        B = rnd.Next(maxLiidetav + 1);
-                        Vastus = A + B;
-                        break;
-                    }
+                // tuutoriali muster: mõlemad liidetavad ühe Next() kutsega
+                int maxLiidetav = 20;
+                if (tase == 1) maxLiidetav = 100;
+                if (tase == 2) maxLiidetav = 999;
 
-                case '-':
-                    {
-                        // tuutoriali muster: subtrahend = Next(1, minuend), seega alati 1 kuni minuend-1
-                        int maxVahendatav = tase == 0 ? 20 : (tase == 1 ? 100 : 999);
-                        A = rnd.Next(1, maxVahendatav + 1);
-                        B = rnd.Next(1, A);
-                        Vastus = A - B;
-                        break;
-                    }
+                A = rnd.Next(maxLiidetav + 1);
+                B = rnd.Next(maxLiidetav + 1);
+                Vastus = A + B;
+            }
+            else if (Tehe == '-')
+            {
+                // tuutoriali muster: subtrahend = Next(1, minuend), seega alati 1 kuni minuend-1
+                int maxVahendatav = 20;
+                if (tase == 1) maxVahendatav = 100;
+                if (tase == 2) maxVahendatav = 999;
 
-                case '*':
-                    {
-                        // tuutoriali muster: Next(min, max)
-                        int minTegur = tase == 0 ? 1 : (tase == 1 ? 2 : 10);
-                        int maxTegur = tase == 0 ? 10 : (tase == 1 ? 20 : 99);
-                        A = rnd.Next(minTegur, maxTegur + 1);
-                        B = rnd.Next(minTegur, maxTegur + 1);
-                        Vastus = A * B;
-                        break;
-                    }
+                A = rnd.Next(1, maxVahendatav + 1);
+                B = rnd.Next(1, A);
+                Vastus = A - B;
+            }
+            else if (Tehe == '*')
+            {
+                // tuutoriali muster: Next(min, max)
+                int minTegur = 1;
+                int maxTegur = 10;
+                if (tase == 1) { minTegur = 2; maxTegur = 20; }
+                if (tase == 2) { minTegur = 10; maxTegur = 99; }
 
-                case '/':
-                    {
-                        // tuutoriali muster: divisor ja jagatis Next(min, max), dividend = divisor * jagatis
-                        int minJag = tase == 0 ? 1 : (tase == 1 ? 2 : 10);
-                        int maxJag = tase == 0 ? 10 : (tase == 1 ? 20 : 50);
-                        B = rnd.Next(minJag, maxJag + 1);
-                        Vastus = rnd.Next(minJag, maxJag + 1);
-                        A = B * Vastus;
-                        break;
-                    }
+                A = rnd.Next(minTegur, maxTegur + 1);
+                B = rnd.Next(minTegur, maxTegur + 1);
+                Vastus = A * B;
+            }
+            else if (Tehe == '/')
+            {
+                // tuutoriali muster: divisor ja jagatis Next(min, max), dividend = divisor * jagatis
+                int minJag = 1;
+                int maxJag = 10;
+                if (tase == 1) { minJag = 2; maxJag = 20; }
+                if (tase == 2) { minJag = 10; maxJag = 50; }
+
+                B = rnd.Next(minJag, maxJag + 1);
+                Vastus = rnd.Next(minJag, maxJag + 1);
+                A = B * Vastus;
             }
         }
 

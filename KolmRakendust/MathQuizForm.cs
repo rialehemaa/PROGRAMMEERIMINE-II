@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Media;
 using System.Windows.Forms;
 
 namespace KolmRakendust
@@ -24,12 +25,15 @@ namespace KolmRakendust
         int sekundeid;
         MathProblem[] ylesanded = new MathProblem[4];
         char[] tehted = { '+', '-', '*', '/' };
+        int valitudTase;
 
         public MathQuizForm()
         {
             this.Text = "Matemaatiline mäng";
             this.Width = 560;
             this.Height = 520;
+
+            LisaNavigatsioonMenu();
 
             grpTase = new GroupBox();
             grpTase.Text = "Tase";
@@ -146,6 +150,40 @@ namespace KolmRakendust
             timer.Tick += Timer_Tick;
         }
 
+        // Menüü, mis lubab liikuda otse teise rakenduse juurde
+        private void LisaNavigatsioonMenu()
+        {
+            MainMenu menu = new MainMenu();
+            MenuItem menuRakendused = new MenuItem("Rakendused");
+            menuRakendused.MenuItems.Add("Pildivaataja", new EventHandler(MenuPilt_Select));
+            menuRakendused.MenuItems.Add("Sarnaste piltide mäng", new EventHandler(MenuMatch_Select));
+            menuRakendused.MenuItems.Add("-");
+            menuRakendused.MenuItems.Add("Peamenüü", new EventHandler(MenuPeamenu_Select));
+            menu.MenuItems.Add(menuRakendused);
+            this.Menu = menu;
+        }
+
+        private void MenuPilt_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            PictureViewerForm f = new PictureViewerForm();
+            f.Show();
+        }
+
+        private void MenuMatch_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MatchingGameForm f = new MatchingGameForm();
+            f.Show();
+        }
+
+        private void MenuPeamenu_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MainForm f = new MainForm();
+            f.Show();
+        }
+
         private void BtnAlusta_Click(object sender, EventArgs e)
         {
             int taseIndeks = 0;
@@ -159,6 +197,8 @@ namespace KolmRakendust
             {
                 if (ajaNupud[i].Checked) ajaIndeks = i;
             }
+
+            valitudTase = taseIndeks;
 
             for (int i = 0; i < 4; i++)
             {
@@ -208,16 +248,27 @@ namespace KolmRakendust
                     oigeid++;
                     tulemused[i].Text = "✓ Õige";
                     tulemused[i].ForeColor = Color.Green;
+                    SystemSounds.Asterisk.Play();
                 }
                 else
                 {
                     tulemused[i].Text = "✗ Õige vastus: " + ylesanded[i].Vastus;
                     tulemused[i].ForeColor = Color.Red;
+                    SystemSounds.Hand.Play();
                 }
                 vastused[i].Enabled = false;
             }
 
-            MessageBox.Show("Õigeid vastuseid: " + oigeid + " / 4", "Tulemus");
+            int punktid = oigeid * 10 * (valitudTase + 1);
+            string[] taseNimed = { "1.-4. klass", "5.-9. klass", "10.-12. klass" };
+            Mangija.SalvestaTulemus(
+                "Matemaatiline mäng",
+                taseNimed[valitudTase] + ", õigeid " + oigeid + "/4",
+                punktid);
+
+            MessageBox.Show(
+                "Õigeid vastuseid: " + oigeid + " / 4\nSaadud punktid: " + punktid,
+                "Tulemus");
             btnAlusta.Enabled = true;
             btnKontrolli.Enabled = false;
             grpTase.Enabled = true;
