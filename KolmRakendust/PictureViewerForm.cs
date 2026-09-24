@@ -18,6 +18,8 @@ namespace KolmRakendust
             this.Width = 800;
             this.Height = 640;
 
+            LisaNavigatsioonMenu();
+
             pic = new PictureBox();
             pic.Dock = DockStyle.Fill;
             pic.SizeMode = PictureBoxSizeMode.Normal;
@@ -90,9 +92,47 @@ namespace KolmRakendust
             slaidTimer.Tick += SlaidTimer_Tick;
         }
 
+        // Menüü, mis lubab liikuda otse teise rakenduse juurde,
+        // ilma peamenüüsse tagasi minemata
+        private void LisaNavigatsioonMenu()
+        {
+            MainMenu menu = new MainMenu();
+            MenuItem menuRakendused = new MenuItem("Rakendused");
+            menuRakendused.MenuItems.Add("Matemaatiline mäng", new EventHandler(MenuMath_Select));
+            menuRakendused.MenuItems.Add("Sarnaste piltide mäng", new EventHandler(MenuMatch_Select));
+            menuRakendused.MenuItems.Add("-");
+            menuRakendused.MenuItems.Add("Peamenüü", new EventHandler(MenuPeamenu_Select));
+            menu.MenuItems.Add(menuRakendused);
+            this.Menu = menu;
+        }
+
+        private void MenuMath_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MathQuizForm f = new MathQuizForm();
+            f.Show();
+        }
+
+        private void MenuMatch_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MatchingGameForm f = new MatchingGameForm();
+            f.Show();
+        }
+
+        private void MenuPeamenu_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MainForm f = new MainForm();
+            f.Show();
+        }
+
         private void ChkVeni_CheckedChanged(object sender, EventArgs e)
         {
-            pic.SizeMode = chkVeni.Checked ? PictureBoxSizeMode.StretchImage : PictureBoxSizeMode.Normal;
+            if (chkVeni.Checked)
+                pic.SizeMode = PictureBoxSizeMode.StretchImage;
+            else
+                pic.SizeMode = PictureBoxSizeMode.Normal;
         }
 
         private void ChkSlaid_CheckedChanged(object sender, EventArgs e)

@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Media;
 using System.Windows.Forms;
 
 namespace KolmRakendust
 {
     public class MatchingGameForm : Form
     {
-        GroupBox grpSuurus;
-        RadioButton rb4, rb6;
+        GroupBox grpSuurus, grpRaskus;
+        RadioButton rb4, rb6, rb8, rb10;
+        RadioButton rbKerge, rbKeskmine, rbRaske;
         Button btnAlusta;
         int valitudSuurus = 4;
+        int ajaLimiit = 60;
 
         List<Label> sildid = new List<Label>();
         Label esimeneValitud = null;
@@ -19,20 +22,21 @@ namespace KolmRakendust
 
         Label lblAeg;
         Timer aegTimer;
-        int mooduSekundeid = 0;
-        bool aegKaib = false;
+        int jaanudAeg;
 
         public MatchingGameForm()
         {
             this.Text = "Sarnaste piltide leidmise mäng";
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Width = 560;
-            this.Height = 200;
+            this.Height = 300;
+
+            LisaNavigatsioonMenu();
 
             grpSuurus = new GroupBox();
             grpSuurus.Text = "Mängulaua suurus";
             grpSuurus.Location = new Point(20, 15);
-            grpSuurus.Size = new Size(210, 90);
+            grpSuurus.Size = new Size(210, 150);
 
             rb4 = new RadioButton();
             rb4.Text = "4 x 4 (8 paari)";
@@ -45,22 +49,60 @@ namespace KolmRakendust
             rb6.Location = new Point(15, 55);
             rb6.AutoSize = true;
 
+            rb8 = new RadioButton();
+            rb8.Text = "8 x 8 (32 paari)";
+            rb8.Location = new Point(15, 85);
+            rb8.AutoSize = true;
+
+            rb10 = new RadioButton();
+            rb10.Text = "10 x 10 (50 paari)";
+            rb10.Location = new Point(15, 115);
+            rb10.AutoSize = true;
+
             grpSuurus.Controls.Add(rb4);
             grpSuurus.Controls.Add(rb6);
+            grpSuurus.Controls.Add(rb8);
+            grpSuurus.Controls.Add(rb10);
+
+            grpRaskus = new GroupBox();
+            grpRaskus.Text = "Raskusaste (aeg)";
+            grpRaskus.Location = new Point(250, 15);
+            grpRaskus.Size = new Size(210, 150);
+
+            rbKerge = new RadioButton();
+            rbKerge.Text = "Kerge (1:00)";
+            rbKerge.Location = new Point(15, 25);
+            rbKerge.AutoSize = true;
+            rbKerge.Checked = true;
+
+            rbKeskmine = new RadioButton();
+            rbKeskmine.Text = "Keskmine (1:15)";
+            rbKeskmine.Location = new Point(15, 55);
+            rbKeskmine.AutoSize = true;
+
+            rbRaske = new RadioButton();
+            rbRaske.Text = "Raske (2:30)";
+            rbRaske.Location = new Point(15, 85);
+            rbRaske.AutoSize = true;
+
+            grpRaskus.Controls.Add(rbKerge);
+            grpRaskus.Controls.Add(rbKeskmine);
+            grpRaskus.Controls.Add(rbRaske);
 
             btnAlusta = new Button();
             btnAlusta.Text = "Alusta mängu";
             btnAlusta.Size = new Size(150, 35);
-            btnAlusta.Location = new Point(260, 40);
+            btnAlusta.Location = new Point(160, 180);
             btnAlusta.Click += BtnAlusta_Click;
 
             lblAeg = new Label();
             lblAeg.Font = new Font("Arial", 12);
             lblAeg.AutoSize = true;
-            lblAeg.Location = new Point(20, 10);
+            lblAeg.Location = new Point(20, 5);
             lblAeg.Visible = false;
 
             this.Controls.Add(grpSuurus);
+            this.Controls.Add(grpRaskus);
             this.Controls.Add(btnAlusta);
             this.Controls.Add(lblAeg);
 
@@ -70,14 +112,79 @@ namespace KolmRakendust
             varjaTimer.Interval = 750;
             varjaTimer.Tick += VarjaTimer_Tick;
 
+            // Taimer, mis loeb allapoole mängule antud ajapiirangust
             aegTimer = new Timer();
             aegTimer.Interval = 1000;
             aegTimer.Tick += AegTimer_Tick;
         }
 
+        // Menüü, mis lubab liikuda otse teise rakenduse juurde
+        private void LisaNavigatsioonMenu()
+        {
+            MainMenu menu = new MainMenu();
+            MenuItem menuRakendused = new MenuItem("Rakendused");
+            menuRakendused.MenuItems.Add("Pildivaataja", new EventHandler(MenuPilt_Select));
+            menuRakendused.MenuItems.Add("Matemaatiline mäng", new EventHandler(MenuMath_Select));
+            menuRakendused.MenuItems.Add("-");
+            menuRakendused.MenuItems.Add("Peamenüü", new EventHandler(MenuPeamenu_Select));
+            menu.MenuItems.Add(menuRakendused);
+            this.Menu = menu;
+        }
+
+        private void MenuPilt_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            PictureViewerForm f = new PictureViewerForm();
+            f.Show();
+        }
+
+        private void MenuMath_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MathQuizForm f = new MathQuizForm();
+            f.Show();
+        }
+
+        private void MenuPeamenu_Select(object sender, EventArgs e)
+        {
+            this.Close();
+            MainForm f = new MainForm();
+            f.Show();
+        }
+
+        private string FormatAeg(int sekundid)
+        {
+            int min = sekundid / 60;
+            int sek = sekundid % 60;
+            return min + ":" + sek.ToString("00");
+        }
+
+        private int RuuduSuurus()
+        {
+            if (valitudSuurus == 4) return 130;
+            if (valitudSuurus == 6) return 87;
+            if (valitudSuurus == 8) return 65;
+            return 52; // 10x10
+        }
+
+        private int FondiSuurus()
+        {
+            if (valitudSuurus == 4) return 48;
+            if (valitudSuurus == 6) return 22;
+            if (valitudSuurus == 8) return 16;
+            return 14; // 10x10
+        }
+
         private void BtnAlusta_Click(object sender, EventArgs e)
         {
-            valitudSuurus = rb6.Checked ? 6 : 4;
+            if (rb10.Checked) valitudSuurus = 10;
+            else if (rb8.Checked) valitudSuurus = 8;
+            else if (rb6.Checked) valitudSuurus = 6;
+            else valitudSuurus = 4;
+
+            ajaLimiit = 60;
+            if (rbKeskmine.Checked) ajaLimiit = 75;
+            if (rbRaske.Checked) ajaLimiit = 150;
 
             foreach (Label l in sildid)
             {
@@ -88,30 +195,33 @@ namespace KolmRakendust
             teineValitud = null;
             varjaTimer.Stop();
             aegTimer.Stop();
-            mooduSekundeid = 0;
-            aegKaib = false;
 
             grpSuurus.Visible = false;
+            grpRaskus.Visible = false;
             btnAlusta.Visible = false;
             lblAeg.Visible = true;
-            lblAeg.Text = "Aeg: 0 sekundit";
-            lblAeg.Location = new Point(20, 10);
+            lblAeg.Location = new Point(20, 5);
 
-            int ruudu = valitudSuurus == 4 ? 130 : 87;
+            jaanudAeg = ajaLimiit;
+            lblAeg.Text = "Aega jäänud: " + FormatAeg(jaanudAeg);
+
+            int ruudu = RuuduSuurus();
             this.Width = valitudSuurus * ruudu + 25;
             this.Height = 40 + valitudSuurus * ruudu + 45;
 
             LooSildid();
             MaaraIkoonidSildile();
+
+            aegTimer.Start();
         }
 
         private void LooSildid()
         {
-            int ruudu = valitudSuurus == 4 ? 130 : 87;
+            int ruudu = RuuduSuurus();
             int algusY = 40;
-            // 4x4 puhul täpselt tuutoriali suurus (48), suurema laua puhul väiksem
-            int fontSuurus = valitudSuurus == 4 ? 48 : 22;
-            string fondiNimi = valitudSuurus == 4 ? "Webdings" : "Arial";
+            int fontSuurus = FondiSuurus();
+            string fondiNimi = "Arial";
+            if (valitudSuurus == 4) fondiNimi = "Webdings";
             int veerg = 0, rida = 0;
 
             for (int i = 0; i < valitudSuurus * valitudSuurus; i++)
@@ -133,33 +243,30 @@ namespace KolmRakendust
             }
         }
 
-        // Igal ikoonil on Webdings fondis oma tähendus:
+        // 4x4 puhul täpselt tuutoriali Webdings ikoonid:
         // "!" = ämblik, "N" = silm, "," = tšillipipar,
-        // "k", "b", "v", "w", "z" = teised Webdings ikoonid
+        // "k", "b", "v", "w", "z" = teised Webdings ikoonid.
+        // Suuremate laudade jaoks (6x6, 10x10, tuutorialis pole neid)
+        // kasutan numbreid, sest neid jagub piisavalt (kuni 50 paari)
         private void MaaraIkoonidSildile()
         {
-            List<string> ikoonid;
+            List<string> ikoonid = new List<string>();
 
             if (valitudSuurus == 4)
             {
-                // täpselt tuutoriali nimekiri
-                ikoonid = new List<string>()
+                ikoonid.AddRange(new string[]
                 {
                     "!", "!", "N", "N", ",", ",", "k", "k",
                     "b", "b", "v", "v", "w", "w", "z", "z"
-                };
+                });
             }
             else
             {
-                // 6x6 laud on minu enda lisatud valik (tuutorialis seda pole),
-                // seega kasutan lihtsaid tähti, sest Webdingsi 18 ikooni koodid
-                // pole tuutorialis kinnitatud
-                ikoonid = new List<string>();
-                for (int i = 0; i < (valitudSuurus * valitudSuurus) / 2; i++)
+                int paariArv = (valitudSuurus * valitudSuurus) / 2;
+                for (int i = 1; i <= paariArv; i++)
                 {
-                    string taht = ((char)('A' + i)).ToString();
-                    ikoonid.Add(taht);
-                    ikoonid.Add(taht);
+                    ikoonid.Add(i.ToString());
+                    ikoonid.Add(i.ToString());
                 }
             }
 
@@ -185,14 +292,6 @@ namespace KolmRakendust
             // kui ikoon on juba must, on kaart juba avatud - ignoreeri
             if (klikitud.ForeColor == Color.Black) return;
 
-            if (!aegKaib)
-            {
-                aegKaib = true;
-                mooduSekundeid = 0;
-                lblAeg.Text = "Aeg: 0 sekundit";
-                aegTimer.Start();
-            }
-
             // kui esimeneValitud on null, on see paari esimene ikoon
             if (esimeneValitud == null)
             {
@@ -211,6 +310,7 @@ namespace KolmRakendust
             // mustaks ja taimerit ei käivitata
             if (esimeneValitud.Text == teineValitud.Text)
             {
+                SystemSounds.Asterisk.Play();
                 esimeneValitud = null;
                 teineValitud = null;
                 return;
@@ -218,13 +318,20 @@ namespace KolmRakendust
 
             // kaks erinevat ikooni valitud - käivita taimer,
             // mis 750 ms pärast need peidab
+            SystemSounds.Exclamation.Play();
             varjaTimer.Start();
         }
 
         private void AegTimer_Tick(object sender, EventArgs e)
         {
-            mooduSekundeid++;
-            lblAeg.Text = "Aeg: " + mooduSekundeid + " sekundit";
+            jaanudAeg--;
+            lblAeg.Text = "Aega jäänud: " + FormatAeg(jaanudAeg);
+
+            if (jaanudAeg <= 0)
+            {
+                aegTimer.Stop();
+                MangKaotatud();
+            }
         }
 
         private void VarjaTimer_Tick(object sender, EventArgs e)
@@ -249,9 +356,43 @@ namespace KolmRakendust
             }
 
             aegTimer.Stop();
-            aegKaib = false;
-            MessageBox.Show("Palju õnne! Leidsid kõik paarid " + mooduSekundeid + " sekundiga!", "Võit!");
+            SystemSounds.Beep.Play();
 
+            // punktid: rohkem allesjäänud aega ja suurem laud annavad rohkem punkte
+            int kordaja;
+            if (valitudSuurus == 4) kordaja = 1;
+            else if (valitudSuurus == 6) kordaja = 2;
+            else if (valitudSuurus == 8) kordaja = 3;
+            else kordaja = 4; // 10x10
+            int punktid = jaanudAeg * 5 * kordaja;
+
+            Mangija.SalvestaTulemus(
+                "Sarnaste piltide mäng",
+                valitudSuurus + "x" + valitudSuurus + ", jäi aega " + FormatAeg(jaanudAeg),
+                punktid);
+
+            MessageBox.Show(
+                "Palju õnne! Leidsid kõik paarid!\nAega jäi alles: " + FormatAeg(jaanudAeg) +
+                "\nSaadud punktid: " + punktid,
+                "Võit!");
+
+            LopetaJaNaitaSeadistust();
+        }
+
+        private void MangKaotatud()
+        {
+            Mangija.SalvestaTulemus(
+                "Sarnaste piltide mäng",
+                valitudSuurus + "x" + valitudSuurus + ", aeg sai otsa",
+                0);
+
+            MessageBox.Show("Aeg sai otsa! Proovi uuesti.", "Mäng läbi");
+
+            LopetaJaNaitaSeadistust();
+        }
+
+        private void LopetaJaNaitaSeadistust()
+        {
             foreach (Label l in sildid)
             {
                 this.Controls.Remove(l);
@@ -260,9 +401,10 @@ namespace KolmRakendust
 
             lblAeg.Visible = false;
             grpSuurus.Visible = true;
+            grpRaskus.Visible = true;
             btnAlusta.Visible = true;
             this.Width = 560;
-            this.Height = 200;
+            this.Height = 300;
         }
     }
 }
