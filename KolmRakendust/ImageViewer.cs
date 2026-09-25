@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 
 namespace KolmRakendust
 {
     public class PictureManager
     {
+        //Пример инкапсуляции: приватный список путей и индекс,
         private List<string> pildid = new List<string>();
         private int indeks = -1;
 

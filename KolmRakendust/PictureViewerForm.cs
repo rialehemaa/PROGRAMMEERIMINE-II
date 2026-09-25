@@ -11,12 +11,19 @@ namespace KolmRakendust
         Button btnNaita, btnTaust, btnTyhjenda, btnPoorra, btnPeegelda, btnSulge;
         PictureManager manager = new PictureManager();
         Timer slaidTimer;
+        MainForm peaVorm;
+        bool liigub = false;
 
-        public PictureViewerForm()
+        public PictureViewerForm(MainForm peaVorm)
         {
+            this.peaVorm = peaVorm;
+
             this.Text = "Pildivaataja";
             this.Width = 800;
             this.Height = 640;
+            Teema.StiliseeriVorm(this);
+
+            this.FormClosed += new FormClosedEventHandler(PictureViewerForm_FormClosed);
 
             LisaNavigatsioonMenu();
 
@@ -28,14 +35,17 @@ namespace KolmRakendust
             Panel paneel = new Panel();
             paneel.Dock = DockStyle.Bottom;
             paneel.Height = 75;
+            paneel.BackColor = Teema.Paneel;
 
             chkVeni = new CheckBox();
             chkVeni.Text = "Venita";
+            chkVeni.ForeColor = Teema.TekstiVarv;
             chkVeni.Location = new Point(10, 10);
             chkVeni.CheckedChanged += ChkVeni_CheckedChanged;
 
             chkSlaid = new CheckBox();
             chkSlaid.Text = "Slaidiesitus";
+            chkSlaid.ForeColor = Teema.TekstiVarv;
             chkSlaid.Location = new Point(10, 40);
             chkSlaid.CheckedChanged += ChkSlaid_CheckedChanged;
 
@@ -44,36 +54,42 @@ namespace KolmRakendust
             btnNaita.Location = new Point(150, 8);
             btnNaita.Size = new Size(100, 28);
             btnNaita.Click += BtnNaita_Click;
+            Teema.StiliseeriNupp(btnNaita);
 
             btnTaust = new Button();
             btnTaust.Text = "Määra taustavärv";
             btnTaust.Location = new Point(260, 8);
             btnTaust.Size = new Size(140, 28);
             btnTaust.Click += BtnTaust_Click;
+            Teema.StiliseeriNupp(btnTaust);
 
             btnTyhjenda = new Button();
             btnTyhjenda.Text = "Tühjenda pilt";
             btnTyhjenda.Location = new Point(410, 8);
             btnTyhjenda.Size = new Size(110, 28);
             btnTyhjenda.Click += BtnTyhjenda_Click;
+            Teema.StiliseeriNupp(btnTyhjenda);
 
             btnPoorra = new Button();
             btnPoorra.Text = "Pööra 90°";
             btnPoorra.Location = new Point(150, 40);
             btnPoorra.Size = new Size(100, 28);
             btnPoorra.Click += BtnPoorra_Click;
+            Teema.StiliseeriNupp(btnPoorra);
 
             btnPeegelda = new Button();
             btnPeegelda.Text = "Peegelda";
             btnPeegelda.Location = new Point(260, 40);
             btnPeegelda.Size = new Size(100, 28);
             btnPeegelda.Click += BtnPeegelda_Click;
+            Teema.StiliseeriNupp(btnPeegelda);
 
             btnSulge = new Button();
             btnSulge.Text = "Sulge";
             btnSulge.Location = new Point(700, 22);
             btnSulge.Size = new Size(80, 28);
             btnSulge.Click += BtnSulge_Click;
+            Teema.StiliseeriNupp(btnSulge);
 
             paneel.Controls.Add(chkVeni);
             paneel.Controls.Add(chkSlaid);
@@ -106,25 +122,37 @@ namespace KolmRakendust
             this.Menu = menu;
         }
 
+        //страховка если окно закрыли крестиком (не через меню),
+        //peaVorm.Show() всё равно покажет главное меню обратно
+        private void PictureViewerForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (!liigub)
+            {
+                peaVorm.Show();
+            }
+        }
+
         private void MenuMath_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MathQuizForm f = new MathQuizForm();
+            MathQuizForm f = new MathQuizForm(peaVorm);
             f.Show();
         }
 
         private void MenuMatch_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MatchingGameForm f = new MatchingGameForm();
+            MatchingGameForm f = new MatchingGameForm(peaVorm);
             f.Show();
         }
 
         private void MenuPeamenu_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MainForm f = new MainForm();
-            f.Show();
+            peaVorm.Show();
         }
 
         private void ChkVeni_CheckedChanged(object sender, EventArgs e)

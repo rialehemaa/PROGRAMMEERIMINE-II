@@ -15,6 +15,8 @@ namespace KolmRakendust
             get { return Path.Combine(Application.StartupPath, "kasutajad.txt"); }
         }
 
+        //построчное чтение kasutajad.txt,
+        //формат имя;пароль (Split(';'))
         public static bool KasutajaOnOlemas(string kasutajanimi)
         {
             if (!File.Exists(FailiTee)) return false;
@@ -48,7 +50,7 @@ namespace KolmRakendust
         public static void LisaKasutaja(string kasutajanimi, string parool)
         {
             try
-            {
+            {//дописывает строку через File.AppendAllText
                 File.AppendAllText(FailiTee, kasutajanimi + ";" + parool + Environment.NewLine);
             }
             catch

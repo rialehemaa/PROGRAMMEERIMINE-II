@@ -11,7 +11,7 @@ namespace KolmRakendust
         GroupBox grpSuurus, grpRaskus;
         RadioButton rb4, rb6, rb8, rb10;
         RadioButton rbKerge, rbKeskmine, rbRaske;
-        Button btnAlusta;
+        Button btnAlusta, btnValju;
         int valitudSuurus = 4;
         int ajaLimiit = 60;
 
@@ -23,13 +23,20 @@ namespace KolmRakendust
         Label lblAeg;
         Timer aegTimer;
         int jaanudAeg;
+        MainForm peaVorm;
+        bool liigub = false;
 
-        public MatchingGameForm()
+        public MatchingGameForm(MainForm peaVorm)
         {
+            this.peaVorm = peaVorm;
+
             this.Text = "Sarnaste piltide leidmise mäng";
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Width = 560;
             this.Height = 300;
+            Teema.StiliseeriVorm(this);
+
+            this.FormClosed += new FormClosedEventHandler(MatchingGameForm_FormClosed);
 
             LisaNavigatsioonMenu();
 
@@ -37,6 +44,7 @@ namespace KolmRakendust
             grpSuurus.Text = "Mängulaua suurus";
             grpSuurus.Location = new Point(20, 15);
             grpSuurus.Size = new Size(210, 150);
+            Teema.StiliseeriGrupp(grpSuurus);
 
             rb4 = new RadioButton();
             rb4.Text = "4 x 4 (8 paari)";
@@ -68,6 +76,7 @@ namespace KolmRakendust
             grpRaskus.Text = "Raskusaste (aeg)";
             grpRaskus.Location = new Point(250, 15);
             grpRaskus.Size = new Size(210, 150);
+            Teema.StiliseeriGrupp(grpRaskus);
 
             rbKerge = new RadioButton();
             rbKerge.Text = "Kerge (1:00)";
@@ -92,19 +101,29 @@ namespace KolmRakendust
             btnAlusta = new Button();
             btnAlusta.Text = "Alusta mängu";
             btnAlusta.Size = new Size(150, 35);
-            btnAlusta.Location = new Point(160, 180);
+            btnAlusta.Location = new Point(110, 180);
             btnAlusta.Click += BtnAlusta_Click;
+            Teema.StiliseeriNupp(btnAlusta);
 
             lblAeg = new Label();
             lblAeg.Font = new Font("Arial", 12);
+            lblAeg.ForeColor = Teema.TekstiVarv;
             lblAeg.AutoSize = true;
             lblAeg.Location = new Point(20, 5);
             lblAeg.Visible = false;
+
+            btnValju = new Button();
+            btnValju.Text = "Välju mängust";
+            btnValju.Size = new Size(150, 35);
+            btnValju.Location = new Point(280, 180);
+            btnValju.Click += BtnValju_Click;
+            Teema.StiliseeriNupp(btnValju);
 
             this.Controls.Add(grpSuurus);
             this.Controls.Add(grpRaskus);
             this.Controls.Add(btnAlusta);
             this.Controls.Add(lblAeg);
+            this.Controls.Add(btnValju);
 
             // Taimer, mis peidab kaks mittesobivat ikooni
             // 750 ms pärast - täpselt nagu tuutorialis
@@ -131,25 +150,44 @@ namespace KolmRakendust
             this.Menu = menu;
         }
 
+        private void MatchingGameForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (!liigub)
+            {
+                peaVorm.Show();
+            }
+        }
+
         private void MenuPilt_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            PictureViewerForm f = new PictureViewerForm();
+            PictureViewerForm f = new PictureViewerForm(peaVorm);
             f.Show();
         }
 
         private void MenuMath_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MathQuizForm f = new MathQuizForm();
+            MathQuizForm f = new MathQuizForm(peaVorm);
             f.Show();
         }
 
         private void MenuPeamenu_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MainForm f = new MainForm();
-            f.Show();
+            peaVorm.Show();
+        }
+
+        private void BtnValju_Click(object sender, EventArgs e)
+        {
+            liigub = true;
+            varjaTimer.Stop();
+            aegTimer.Stop();
+            this.Close();
+            peaVorm.Show();
         }
 
         private string FormatAeg(int sekundid)
@@ -159,6 +197,7 @@ namespace KolmRakendust
             return min + ":" + sek.ToString("00");
         }
 
+        //размери сетки
         private int RuuduSuurus()
         {
             if (valitudSuurus == 4) return 130;
@@ -166,7 +205,7 @@ namespace KolmRakendust
             if (valitudSuurus == 8) return 65;
             return 52; // 10x10
         }
-
+        //размери шрифта
         private int FondiSuurus()
         {
             if (valitudSuurus == 4) return 48;
@@ -209,6 +248,11 @@ namespace KolmRakendust
             this.Width = valitudSuurus * ruudu + 25;
             this.Height = 40 + valitudSuurus * ruudu + 45;
 
+            // mängu ajal ei mahu nupp enam Alusta mängu kõrvale ära -
+            // tõsta see ülemisse paremasse nurka, kus kaardid veel ei alga (need algavad y=40 juures)
+            btnValju.Size = new Size(130, 25);
+            btnValju.Location = new Point(this.Width - 150, 5);
+
             LooSildid();
             MaaraIkoonidSildile();
 
@@ -231,7 +275,7 @@ namespace KolmRakendust
                 l.Location = new Point(veerg * ruudu, algusY + rida * ruudu);
                 l.Font = new Font(fondiNimi, fontSuurus, FontStyle.Bold);
                 l.TextAlign = ContentAlignment.MiddleCenter;
-                l.BackColor = Color.CornflowerBlue;
+                l.BackColor = Teema.KaardiVarv;
                 l.BorderStyle = BorderStyle.FixedSingle;
                 l.Click += Silt_Click;
 
@@ -321,7 +365,7 @@ namespace KolmRakendust
             SystemSounds.Exclamation.Play();
             varjaTimer.Start();
         }
-
+        //обратный отсчёт времени, при 0 → MangKaotatud()
         private void AegTimer_Tick(object sender, EventArgs e)
         {
             jaanudAeg--;
@@ -390,7 +434,8 @@ namespace KolmRakendust
 
             LopetaJaNaitaSeadistust();
         }
-
+        //общий метод возврата на экран настроек
+        //(и после победы, и после проигрыша)
         private void LopetaJaNaitaSeadistust()
         {
             foreach (Label l in sildid)
@@ -405,6 +450,9 @@ namespace KolmRakendust
             btnAlusta.Visible = true;
             this.Width = 560;
             this.Height = 300;
+
+            btnValju.Size = new Size(150, 35);
+            btnValju.Location = new Point(280, 180);
         }
     }
 }

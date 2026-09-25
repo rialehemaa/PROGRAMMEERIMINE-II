@@ -8,14 +8,14 @@ namespace KolmRakendust
     // mida kasutavad nii matemaatiline mäng kui ka sarnaste piltide mäng
     public static class Mangija
     {
-        public static string Kasutajanimi { get; set; } = "";
+        public static string Kasutajanimi { get; set; } = "";//сюда идет имя после входа
         public static int KogutudPunktid { get; private set; } = 0;
 
         private static string FailiTee
         {
             get { return Path.Combine(Application.StartupPath, "tulemused.txt"); }
         }
-
+        //отдельное сохранение даних/результатов
         public static void SalvestaTulemus(string mang, string kirjeldus, int punktid)
         {
             KogutudPunktid += punktid;
@@ -42,6 +42,7 @@ namespace KolmRakendust
             }
         }
 
+        //читает весь файл для показа в меин форм
         public static string LoeAjalugu()
         {
             if (!File.Exists(FailiTee)) return "Tulemusi pole veel salvestatud.";
