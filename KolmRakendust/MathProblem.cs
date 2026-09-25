@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace KolmRakendust
 {
@@ -20,11 +20,12 @@ namespace KolmRakendust
             GeneraeriUus();
         }
 
+        // числа для игри с лимитом по сложности(1-4/5-9/10-12 класс)
         public void GeneraeriUus()
         {
             if (Tehe == '+')
             {
-                // tuutoriali muster: m�lemad liidetavad �he Next() kutsega
+                // tuutoriali muster: mõlemad liidetavad ühe Next() kutsega
                 int maxLiidetav = 20;
                 if (tase == 1) maxLiidetav = 100;
                 if (tase == 2) maxLiidetav = 999;

@@ -20,18 +20,25 @@ namespace KolmRakendust
         Label[] vordub = new Label[4];
         NumericUpDown[] vastused = new NumericUpDown[4];
         Label[] tulemused = new Label[4];
-        Button btnAlusta, btnKontrolli;
+        Button btnAlusta, btnKontrolli, btnValju;
         Timer timer;
         int sekundeid;
         MathProblem[] ylesanded = new MathProblem[4];
         char[] tehted = { '+', '-', '*', '/' };
         int valitudTase;
+        MainForm peaVorm;
+        bool liigub = false;
 
-        public MathQuizForm()
+        public MathQuizForm(MainForm peaVorm)
         {
+            this.peaVorm = peaVorm;
+
             this.Text = "Matemaatiline mäng";
             this.Width = 560;
             this.Height = 520;
+            Teema.StiliseeriVorm(this);
+
+            this.FormClosed += new FormClosedEventHandler(MathQuizForm_FormClosed);
 
             LisaNavigatsioonMenu();
 
@@ -39,6 +46,7 @@ namespace KolmRakendust
             grpTase.Text = "Tase";
             grpTase.Location = new Point(20, 15);
             grpTase.Size = new Size(170, 115);
+            Teema.StiliseeriGrupp(grpTase);
             string[] taseSildid = { "1. - 4. klass", "5. - 9. klass", "10. - 12. klass" };
             for (int i = 0; i < 3; i++)
             {
@@ -54,6 +62,7 @@ namespace KolmRakendust
             grpAeg.Text = "Aeg";
             grpAeg.Location = new Point(210, 15);
             grpAeg.Size = new Size(170, 115);
+            Teema.StiliseeriGrupp(grpAeg);
             string[] ajaSildid = { "30 sekundit", "45 sekundit", "60 sekundit" };
             for (int i = 0; i < 3; i++)
             {
@@ -69,6 +78,7 @@ namespace KolmRakendust
             lblAeg.Text = "Aega jäänud";
             lblAeg.AutoSize = true;
             lblAeg.Font = new Font("Arial", 12);
+            lblAeg.ForeColor = Teema.TekstiVarv;
             lblAeg.Location = new Point(120, 145);
 
             txtAeg = new TextBox();
@@ -83,22 +93,26 @@ namespace KolmRakendust
                 opA[i] = new Label();
                 opA[i].AutoSize = true;
                 opA[i].Font = new Font("Arial", 14);
+                opA[i].ForeColor = Teema.TekstiVarv;
                 opA[i].Location = new Point(30, y);
 
                 opTehe[i] = new Label();
                 opTehe[i].AutoSize = true;
                 opTehe[i].Font = new Font("Arial", 14);
+                opTehe[i].ForeColor = Teema.TekstiVarv;
                 opTehe[i].Location = new Point(110, y);
 
                 opB[i] = new Label();
                 opB[i].AutoSize = true;
                 opB[i].Font = new Font("Arial", 14);
+                opB[i].ForeColor = Teema.TekstiVarv;
                 opB[i].Location = new Point(150, y);
 
                 vordub[i] = new Label();
                 vordub[i].Text = "=";
                 vordub[i].AutoSize = true;
                 vordub[i].Font = new Font("Arial", 14);
+                vordub[i].ForeColor = Teema.TekstiVarv;
                 vordub[i].Location = new Point(220, y);
 
                 vastused[i] = new NumericUpDown();
@@ -130,6 +144,7 @@ namespace KolmRakendust
             btnAlusta.Size = new Size(150, 35);
             btnAlusta.Location = new Point(50, y + 20);
             btnAlusta.Click += BtnAlusta_Click;
+            Teema.StiliseeriNupp(btnAlusta);
 
             btnKontrolli = new Button();
             btnKontrolli.Text = "Kontrolli vastuseid";
@@ -137,6 +152,14 @@ namespace KolmRakendust
             btnKontrolli.Location = new Point(220, y + 20);
             btnKontrolli.Enabled = false;
             btnKontrolli.Click += BtnKontrolli_Click;
+            Teema.StiliseeriNupp(btnKontrolli);
+
+            btnValju = new Button();
+            btnValju.Text = "Välju mängust";
+            btnValju.Size = new Size(150, 35);
+            btnValju.Location = new Point(390, y + 20);
+            btnValju.Click += BtnValju_Click;
+            Teema.StiliseeriNupp(btnValju);
 
             this.Controls.Add(grpTase);
             this.Controls.Add(grpAeg);
@@ -144,6 +167,7 @@ namespace KolmRakendust
             this.Controls.Add(txtAeg);
             this.Controls.Add(btnAlusta);
             this.Controls.Add(btnKontrolli);
+            this.Controls.Add(btnValju);
 
             timer = new Timer();
             timer.Interval = 1000;
@@ -163,27 +187,39 @@ namespace KolmRakendust
             this.Menu = menu;
         }
 
+        private void MathQuizForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (!liigub)
+            {
+                peaVorm.Show();
+            }
+        }
+
         private void MenuPilt_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            PictureViewerForm f = new PictureViewerForm();
+            PictureViewerForm f = new PictureViewerForm(peaVorm);
             f.Show();
         }
 
         private void MenuMatch_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MatchingGameForm f = new MatchingGameForm();
+            MatchingGameForm f = new MatchingGameForm(peaVorm);
             f.Show();
         }
 
         private void MenuPeamenu_Select(object sender, EventArgs e)
         {
+            liigub = true;
             this.Close();
-            MainForm f = new MainForm();
-            f.Show();
+            peaVorm.Show();
         }
 
+        //считывает уровень/время,
+        // создаёт 4 объекта MathProblem(по одному на + - * /)
         private void BtnAlusta_Click(object sender, EventArgs e)
         {
             int taseIndeks = 0;
@@ -225,6 +261,14 @@ namespace KolmRakendust
             timer.Stop();
             LopetaMang();
         }
+        //можно вийти с игри и вернуться в меню
+        private void BtnValju_Click(object sender, EventArgs e)
+        {
+            liigub = true;
+            timer.Stop();
+            this.Close();
+            peaVorm.Show();
+        }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -238,6 +282,8 @@ namespace KolmRakendust
             }
         }
 
+        //проверяет ответы, играет звук (SystemSounds),
+        //считает очки ( int punktid = oigeid * 10 * (valitudTase + 1);)
         private void LopetaMang()
         {
             int oigeid = 0;
@@ -247,13 +293,13 @@ namespace KolmRakendust
                 {
                     oigeid++;
                     tulemused[i].Text = "✓ Õige";
-                    tulemused[i].ForeColor = Color.Green;
+                    tulemused[i].ForeColor = Teema.RohelineVarv;
                     SystemSounds.Asterisk.Play();
                 }
                 else
                 {
                     tulemused[i].Text = "✗ Õige vastus: " + ylesanded[i].Vastus;
-                    tulemused[i].ForeColor = Color.Red;
+                    tulemused[i].ForeColor = Teema.PunaneVarv;
                     SystemSounds.Hand.Play();
                 }
                 vastused[i].Enabled = false;
