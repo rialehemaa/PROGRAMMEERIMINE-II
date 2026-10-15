@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace Tooded_DB
 {
@@ -26,7 +24,22 @@ namespace Tooded_DB
             LaeTooted();
         }
 
+        // Laeb pildi ilma faili lukustamata
+        private Image LaePilt(string tee)
+        {
+            using var fs = new FileStream(tee, FileMode.Open, FileAccess.Read);
+            using var tmp = Image.FromStream(fs);
+            return new Bitmap(tmp);
+        }
 
+        // Kopeerib pildi Images kausta (kui see pole juba seal)
+        private void KopeeriPilt(string allikas, string failinimi)
+        {
+            Directory.CreateDirectory("Images");
+            string siht = Path.GetFullPath(Path.Combine("Images", failinimi));
+            if (!string.Equals(Path.GetFullPath(allikas), siht, StringComparison.OrdinalIgnoreCase))
+                File.Copy(allikas, siht, true);
+        }
 
         private void LaeKategooriad()
         {
@@ -34,6 +47,7 @@ namespace Tooded_DB
             comboKategooria.DisplayMember = "Kategooria_nimetus";
             comboKategooria.ValueMember = "Id";
         }
+
         private void LaeTooted()
         {
             dataGridViewTooted.DataSource = _db.Toodetabel
@@ -58,7 +72,7 @@ namespace Tooded_DB
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 valitudPilt = ofd.FileName;
-                picturePilt.Image = Image.FromFile(valitudPilt);
+                picturePilt.Image = LaePilt(valitudPilt);
             }
         }
 
@@ -70,14 +84,11 @@ namespace Tooded_DB
                 Kogus = int.Parse(txtKogus.Text),
                 Hind = float.Parse(txtHind.Text),
                 KategooriaId = (int)comboKategooria.SelectedValue,
-                Pilt = Path.GetFileName(valitudPilt)
+                Pilt = string.IsNullOrEmpty(valitudPilt) ? null : Path.GetFileName(valitudPilt)
             };
 
-            // kopeerime pildi projekti kausta
             if (!string.IsNullOrEmpty(valitudPilt))
-            {
-                File.Copy(valitudPilt, Path.Combine("Images", uus.Pilt), true);
-            }
+                KopeeriPilt(valitudPilt, uus.Pilt);
 
             _db.Toodetabel.Add(uus);
             _db.SaveChanges();
@@ -95,7 +106,9 @@ namespace Tooded_DB
             string pilt = dataGridViewTooted.Rows[e.RowIndex].Cells["Pilt"].Value?.ToString();
 
             if (!string.IsNullOrEmpty(pilt) && File.Exists(Path.Combine("Images", pilt)))
-                picturePilt.Image = Image.FromFile(Path.Combine("Images", pilt));
+                picturePilt.Image = LaePilt(Path.Combine("Images", pilt));
+            else
+                picturePilt.Image = null;
         }
 
         private void btnUuenda_Click(object sender, EventArgs e)
@@ -112,7 +125,7 @@ namespace Tooded_DB
             if (valitudPilt != null)
             {
                 toode.Pilt = Path.GetFileName(valitudPilt);
-                File.Copy(valitudPilt, Path.Combine("Images", toode.Pilt), true);
+                KopeeriPilt(valitudPilt, toode.Pilt);
             }
 
             _db.SaveChanges();
@@ -135,5 +148,4 @@ namespace Tooded_DB
 
         }
     }
-
 }

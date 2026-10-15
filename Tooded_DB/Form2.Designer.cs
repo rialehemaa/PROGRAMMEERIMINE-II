@@ -35,10 +35,12 @@ namespace Tooded_DB
             // 
             // dataGridViewTooted
             // 
+            dataGridViewTooted.ColumnHeadersHeight = 29;
             dataGridViewTooted.Location = new Point(12, 12);
             dataGridViewTooted.MultiSelect = false;
             dataGridViewTooted.Name = "dataGridViewTooted";
             dataGridViewTooted.ReadOnly = true;
+            dataGridViewTooted.RowHeadersWidth = 51;
             dataGridViewTooted.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridViewTooted.Size = new Size(600, 328);
             dataGridViewTooted.TabIndex = 0;
@@ -50,7 +52,7 @@ namespace Tooded_DB
             txtNimetus.Location = new Point(630, 30);
             txtNimetus.Name = "txtNimetus";
             txtNimetus.PlaceholderText = "Toote nimetus";
-            txtNimetus.Size = new Size(200, 23);
+            txtNimetus.Size = new Size(200, 27);
             txtNimetus.TabIndex = 1;
             // 
             // txtKogus
@@ -58,7 +60,7 @@ namespace Tooded_DB
             txtKogus.Location = new Point(630, 70);
             txtKogus.Name = "txtKogus";
             txtKogus.PlaceholderText = "Kogus";
-            txtKogus.Size = new Size(200, 23);
+            txtKogus.Size = new Size(200, 27);
             txtKogus.TabIndex = 2;
             // 
             // txtHind
@@ -66,14 +68,14 @@ namespace Tooded_DB
             txtHind.Location = new Point(630, 110);
             txtHind.Name = "txtHind";
             txtHind.PlaceholderText = "Hind €";
-            txtHind.Size = new Size(200, 23);
+            txtHind.Size = new Size(200, 27);
             txtHind.TabIndex = 3;
             // 
             // comboKategooria
             // 
             comboKategooria.Location = new Point(630, 150);
             comboKategooria.Name = "comboKategooria";
-            comboKategooria.Size = new Size(200, 23);
+            comboKategooria.Size = new Size(200, 28);
             comboKategooria.TabIndex = 4;
             // 
             // picturePilt
@@ -124,7 +126,7 @@ namespace Tooded_DB
             // 
             // Form2
             // 
-            ClientSize = new Size(860, 520);
+            ClientSize = new Size(1202, 520);
             Controls.Add(dataGridViewTooted);
             Controls.Add(txtNimetus);
             Controls.Add(txtKogus);
