@@ -26,6 +26,7 @@ namespace Tooded_DB
         private DataGridView gridKorv;
         private Label lblKokku, lblMaksta, lblKlient;
         private TextBox txtKaart;
+        private string _viimaneTsekk;   // viimase tšeki PDF tee (e-maili saatmiseks)
         private CheckBox chkBoonus;
         private Klient _klient;               // valitud klient (null = klienti pole)
         private const decimal BoonusMaar = 0.05m;   // 5% ostusummast läheb boonusesse
@@ -85,7 +86,10 @@ namespace Tooded_DB
             var btnMaksa = Nupp("Maksa ja loo tšekk (PDF)", 10, 548, 400, (s, e) => Maksa());
             btnMaksa.Height = 50;
 
-            paremPaneel.Controls.AddRange(new Control[] { lKorv, gridKorv, btnPlus, btnMiinus, btnEemalda, btnTuhjenda,
+            var btnEmail = Nupp("Saada viimane tšekk e-mailile", 10, 606, 400, (s, e) => SaadaEmail());
+            btnEmail.Height = 36;
+
+            paremPaneel.Controls.AddRange(new Control[] { btnEmail, lKorv, gridKorv, btnPlus, btnMiinus, btnEemalda, btnTuhjenda,
                 lKaart, txtKaart, btnOtsiKlient, btnEemaldaKlient, lblKlient, chkBoonus, lblKokku, lblMaksta, btnMaksa });
 
             // ülemine riba: kategooria filter
@@ -440,6 +444,7 @@ namespace Tooded_DB
                 });
                 db.SaveChanges();
                 tx.Commit();
+                _viimaneTsekk = tee;
 
                 string teade = "Ost on sooritatud!\nMaksta: " + makstud.ToString("0.00") + " €";
                 if (klient != null)
@@ -457,6 +462,55 @@ namespace Tooded_DB
             {
                 MessageBox.Show("Ostu ei õnnestunud sooritada (laoseisu ei muudetud):\n" + (ex.InnerException?.Message ?? ex.Message));
             }
+        }
+
+        // ---------- Tšeki saatmine e-mailile ----------
+        private void SaadaEmail()
+        {
+            if (string.IsNullOrEmpty(_viimaneTsekk) || !File.Exists(_viimaneTsekk))
+            {
+                MessageBox.Show("Esmalt tee ost, et tekiks tšekk.");
+                return;
+            }
+
+            string email = Kysi("Saada tšekk", "Sisesta saaja e-mail:", _klient?.Email ?? "");
+            if (string.IsNullOrWhiteSpace(email)) return;
+
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                Epost.Saada(email.Trim(), _viimaneTsekk);
+                MessageBox.Show("Tšekk saadetud: " + email.Trim());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("E-maili saatmine ebaõnnestus:\n" + (ex.InnerException?.Message ?? ex.Message));
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
+
+        private string Kysi(string pealkiri, string kysimus, string algne)
+        {
+            using var f = new Form
+            {
+                Text = pealkiri,
+                ClientSize = new Size(360, 130),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+            var l = new Label { Text = kysimus, Location = new Point(15, 15), AutoSize = true };
+            var tb = new TextBox { Location = new Point(15, 42), Width = 330, Text = algne };
+            var ok = new Button { Text = "OK", Location = new Point(180, 85), DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = "Tühista", Location = new Point(265, 85), DialogResult = DialogResult.Cancel };
+            f.Controls.AddRange(new Control[] { l, tb, ok, cancel });
+            f.AcceptButton = ok;
+            f.CancelButton = cancel;
+            return f.ShowDialog(this) == DialogResult.OK ? tb.Text : null;
         }
 
         private string LooTsekk(Klient klient, decimal kokku, decimal kasutatud, decimal makstud, decimal saadud)
