@@ -8,7 +8,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
-            ClientSize = new Size(300, 375);
+            ClientSize = new Size(300, 440);
 
             var tere = new Label
             {
@@ -45,7 +45,14 @@
                 f.ShowDialog(this);
             };
 
-            var btnValja = new Button { Text = "Logi välja", Location = new Point(30, 310), Size = new Size(240, 40) };
+            var btnPood = new Button { Text = "Pood", Location = new Point(30, 270), Size = new Size(240, 45) };
+            btnPood.Click += (s, e) =>
+            {
+                using var f = new Form3();
+                f.ShowDialog(this);
+            };
+
+            var btnValja = new Button { Text = "Logi välja", Location = new Point(30, 375), Size = new Size(240, 40) };
             btnValja.Click += (s, e) => { DialogResult = DialogResult.Retry; };
 
             // Omanikul on täielik juurdepääs (Tooted + Kassa), müüjale on kättesaadav ainult Kassa
@@ -53,7 +60,7 @@
             btnKliendid.Enabled = AktiivneKasutaja.OnOmanik;
             btnMuugid.Enabled = AktiivneKasutaja.OnOmanik;
 
-            Controls.AddRange(new Control[] { tere, btnKassa, btnTooted, btnKliendid, btnMuugid, btnValja });
+            Controls.AddRange(new Control[] { tere, btnKassa, btnTooted, btnKliendid, btnMuugid, btnPood, btnValja });
         }
     }
 }
