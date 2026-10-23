@@ -96,6 +96,9 @@ namespace Tooded_DB.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("Synnipaev")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Telefon")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
@@ -137,8 +140,14 @@ namespace Tooded_DB.Migrations
                     b.Property<DateTime>("Kuupaev")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Maksetuup")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Makstud")
                         .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SynnipaevaSoodus")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -169,6 +178,12 @@ namespace Tooded_DB.Migrations
 
                     b.Property<string>("Pilt")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Soodus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("SoodusKuni")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Toodenimetus")
                         .HasColumnType("nvarchar(max)");

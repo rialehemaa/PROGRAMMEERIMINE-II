@@ -6,9 +6,8 @@
         {
             Text = "Peamenüü";
             StartPosition = FormStartPosition.CenterScreen;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            ClientSize = new Size(300, 440);
+            ClientSize = new Size(300, 560);
+            MinimumSize = new Size(320, 600);
 
             var tere = new Label
             {
@@ -52,15 +51,40 @@
                 f.ShowDialog(this);
             };
 
-            var btnValja = new Button { Text = "Logi välja", Location = new Point(30, 375), Size = new Size(240, 40) };
+            var btnSoodused = new Button { Text = "Soodused (haldus)", Location = new Point(30, 325), Size = new Size(240, 45) };
+            btnSoodused.Click += (s, e) =>
+            {
+                using var f = new SoodusedForm(true);
+                f.ShowDialog(this);
+            };
+
+            var btnPakkumised = new Button { Text = "Nädala pakkumised", Location = new Point(30, 380), Size = new Size(240, 45) };
+            btnPakkumised.Click += (s, e) =>
+            {
+                using var f = new SoodusedForm(false);
+                f.ShowDialog(this);
+            };
+
+            var btnNimekiri = new Button { Text = "Ostunimekiri", Location = new Point(30, 435), Size = new Size(240, 45) };
+            btnNimekiri.Click += (s, e) =>
+            {
+                using var f = new OstunimekiriForm();
+                f.ShowDialog(this);
+            };
+
+            var btnValja = new Button { Text = "Logi välja", Location = new Point(30, 495), Size = new Size(240, 40) };
             btnValja.Click += (s, e) => { DialogResult = DialogResult.Retry; };
 
             // Omanikul on täielik juurdepääs (Tooted + Kassa), müüjale on kättesaadav ainult Kassa
             btnTooted.Enabled = AktiivneKasutaja.OnOmanik;
             btnKliendid.Enabled = AktiivneKasutaja.OnOmanik;
             btnMuugid.Enabled = AktiivneKasutaja.OnOmanik;
+            // Klient (ostja) näeb ainult poodi ja nädala pakkumisi
+            btnKassa.Enabled = !AktiivneKasutaja.OnKlient;
+            btnSoodused.Enabled = !AktiivneKasutaja.OnKlient;
 
-            Controls.AddRange(new Control[] { tere, btnKassa, btnTooted, btnKliendid, btnMuugid, btnPood, btnValja });
+            Controls.AddRange(new Control[] { tere, btnKassa, btnTooted, btnKliendid, btnMuugid, btnPood, btnSoodused, btnPakkumised, btnNimekiri, btnValja });
+            Teema.Rakenda(this);
         }
     }
 }

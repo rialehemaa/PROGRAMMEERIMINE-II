@@ -48,6 +48,7 @@ namespace Tooded_DB
 
             Controls.AddRange(new Control[] { pealkiri, l1, txtNimi, l2, txtParool, lblViga, btnLogin, btnRegistreeri });
             AcceptButton = btnLogin;
+            Teema.Rakenda(this);
         }
 
         private void btnLogin_Click(object sender, EventArgs e)

@@ -19,6 +19,7 @@ namespace Tooded_DB
         public Form2()
         {
             InitializeComponent();
+            Teema.Rakenda(this);
             _db = new ToodedContext();
             comboKategooria.DropDownStyle = ComboBoxStyle.DropDownList;   // ainult valik, teksti sisestada ei saa
             LaeKategooriad();
