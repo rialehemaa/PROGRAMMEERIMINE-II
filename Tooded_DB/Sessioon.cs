@@ -8,6 +8,7 @@ namespace Tooded_DB
     {
         public const string Muuja = "Müüja";
         public const string Omanik = "Omanik";
+        public const string Klient = "Klient";   // näeb ainult nädala pakkumisi
     }
 
     // Hetkel sisse logitud kasutaja
@@ -18,6 +19,7 @@ namespace Tooded_DB
         public static string Roll { get; set; }
 
         public static bool OnOmanik => Roll == Rollid.Omanik;
+        public static bool OnKlient => Roll == Rollid.Klient;
 
         public static void Tuhjenda()
         {

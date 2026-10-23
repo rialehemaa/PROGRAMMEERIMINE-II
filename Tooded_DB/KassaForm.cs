@@ -28,6 +28,7 @@ namespace Tooded_DB
         private TextBox txtKaart;
         private string _viimaneTsekk;   // viimase tšeki PDF tee (e-maili saatmiseks)
         private CheckBox chkBoonus;
+        private ComboBox comboMakse;
         private Klient _klient;               // valitud klient (null = klienti pole)
         private const decimal BoonusMaar = 0.05m;   // 5% ostusummast läheb boonusesse
 
@@ -37,10 +38,11 @@ namespace Tooded_DB
         {
             Text = "Kassa";
             StartPosition = FormStartPosition.CenterScreen;
-            ClientSize = new Size(1200, 700);
+            ClientSize = new Size(1150, 680);
             MinimumSize = new Size(1000, 600);
 
             EhitaUi();
+            Teema.Rakenda(this);
             Load += (s, e) => { LaeKategooriad(); UuendaSumma(); };
         }
 
@@ -48,7 +50,7 @@ namespace Tooded_DB
         private void EhitaUi()
         {
             // parem pool: ostukorv
-            var paremPaneel = new Panel { Dock = DockStyle.Right, Width = 420 };
+            var paremPaneel = new Panel { Dock = DockStyle.Right, Width = 420, AutoScroll = true };
 
             var lKorv = new Label { Text = "Ostukorv", Location = new Point(10, 10), AutoSize = true, Font = new Font(Font.FontFamily, 11, FontStyle.Bold) };
             gridKorv = new DataGridView
@@ -80,17 +82,22 @@ namespace Tooded_DB
             chkBoonus = new CheckBox { Text = "Kasuta boonust", Location = new Point(10, 448), AutoSize = true, Enabled = false };
             chkBoonus.CheckedChanged += (s, e) => UuendaSumma();
 
-            lblKokku = new Label { Location = new Point(10, 478), Size = new Size(400, 24), Font = new Font(Font.FontFamily, 11, FontStyle.Bold) };
-            lblMaksta = new Label { Location = new Point(10, 504), Size = new Size(400, 34), Font = new Font(Font.FontFamily, 15, FontStyle.Bold) };
+            var lMakse = new Label { Text = "Makseviis:", Location = new Point(10, 482), AutoSize = true };
+            comboMakse = new ComboBox { Location = new Point(95, 478), Width = 305, DropDownStyle = ComboBoxStyle.DropDownList };
+            comboMakse.Items.AddRange(new object[] { "Maksa kohe (siin ja praegu)", "Sularahas", "Kaardiga", "Arvega (maksmata)" });
+            comboMakse.SelectedIndex = 0;
 
-            var btnMaksa = Nupp("Maksa ja loo tšekk (PDF)", 10, 548, 400, (s, e) => Maksa());
+            lblKokku = new Label { Location = new Point(10, 514), Size = new Size(400, 50), Font = new Font(Font.FontFamily, 10, FontStyle.Bold) };
+            lblMaksta = new Label { Location = new Point(10, 566), Size = new Size(400, 34), Font = new Font(Font.FontFamily, 15, FontStyle.Bold) };
+
+            var btnMaksa = Nupp("Maksa ja loo tšekk (PDF)", 10, 606, 400, (s, e) => Maksa());
             btnMaksa.Height = 50;
 
-            var btnEmail = Nupp("Saada viimane tšekk e-mailile", 10, 606, 400, (s, e) => SaadaEmail());
+            var btnEmail = Nupp("Saada viimane tšekk e-mailile", 10, 664, 400, (s, e) => SaadaEmail());
             btnEmail.Height = 36;
 
             paremPaneel.Controls.AddRange(new Control[] { btnEmail, lKorv, gridKorv, btnPlus, btnMiinus, btnEemalda, btnTuhjenda,
-                lKaart, txtKaart, btnOtsiKlient, btnEemaldaKlient, lblKlient, chkBoonus, lblKokku, lblMaksta, btnMaksa });
+                lKaart, txtKaart, btnOtsiKlient, btnEemaldaKlient, lblKlient, chkBoonus, lMakse, comboMakse, lblKokku, lblMaksta, btnMaksa });
 
             // ülemine riba: kategooria filter
             var ylaPaneel = new Panel { Dock = DockStyle.Top, Height = 45 };
@@ -204,12 +211,17 @@ namespace Tooded_DB
                 AutoEllipsis = true
             };
 
+            bool soodus = Allahindlus.SoodusKehtib(t);
             var hind = new Label
             {
-                Text = Math.Round((decimal)t.Hind, 2).ToString("0.00") + " €",
+                Text = soodus
+                    ? $"−{t.Soodus}%  {Allahindlus.HindPraegu(t):0.00} € ({Math.Round((decimal)t.Hind, 2):0.00})"
+                    : Math.Round((decimal)t.Hind, 2).ToString("0.00") + " €",
                 Location = new Point(4, 156),
                 Size = new Size(150, 20),
-                TextAlign = ContentAlignment.MiddleCenter
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = soodus ? Color.Firebrick : SystemColors.ControlText,
+                Font = new Font(Font.FontFamily, soodus ? 8.5f : 9f, soodus ? FontStyle.Bold : FontStyle.Regular)
             };
 
             bool vahe = t.Kogus <= VaheLaoseis;
@@ -269,7 +281,7 @@ namespace Tooded_DB
                     ToodeId = t.Id,
                     Toode = t.Toodenimetus,
                     Kogus = 1,
-                    Hind = Math.Round((decimal)t.Hind, 2),
+                    Hind = Allahindlus.HindPraegu(t),
                     Laos = t.Kogus
                 });
             }
@@ -316,10 +328,12 @@ namespace Tooded_DB
         {
             _korv.ResetBindings();   // värskendab tabelit ja Summa veergu
             decimal kokku = _korv.Sum(r => r.Summa);
-            decimal kasutatav = KasutatavBoonus(_klient, kokku);
+            decimal sp = Allahindlus.SynnipaevaSoodus(_klient, kokku);
+            decimal kasutatav = KasutatavBoonus(_klient, kokku - sp);
             lblKokku.Text = "Kokku: " + kokku.ToString("0.00") + " €" +
-                            (kasutatav > 0 ? "   Boonus: −" + kasutatav.ToString("0.00") + " €" : "");
-            lblMaksta.Text = "Maksta: " + (kokku - kasutatav).ToString("0.00") + " €";
+                            (sp > 0 ? "\nSünnipäevasoodus (−10%): −" + sp.ToString("0.00") + " €" : "") +
+                            (kasutatav > 0 ? "\nBoonus: −" + kasutatav.ToString("0.00") + " €" : "");
+            lblMaksta.Text = "Maksta: " + (kokku - sp - kasutatav).ToString("0.00") + " €";
         }
 
         // ---------- Kliendikaart ja boonus ----------
@@ -364,18 +378,83 @@ namespace Tooded_DB
             }
             else
             {
-                lblKlient.Text = $"{k.Nimi}   (boonus: {k.Boonus:0.00} €)";
+                lblKlient.Text = $"{k.Nimi}   (boonus: {k.Boonus:0.00} €)" +
+                                 (Allahindlus.OnSynnipaevaAeg(k) ? "   🎂 −10%" : "");
             }
             UuendaSumma();
         }
 
         // ---------- Maksmine, laoseis ja PDF ----------
+        // summa, mis klient praegu maksma peab (sama arvutus mis UuendaSumma-s)
+        private decimal ArvutaMaksta()
+        {
+            decimal kokku = _korv.Sum(r => r.Summa);
+            decimal sp = Allahindlus.SynnipaevaSoodus(_klient, kokku);
+            return kokku - sp - KasutatavBoonus(_klient, kokku - sp);
+        }
+
+        // Sularaha: küsib, kui palju klient andis, ja näitab jooksvalt, kui palju tagasi anda
+        private decimal? KysiSularaha(decimal maksta)
+        {
+            using var f = new Form
+            {
+                Text = "Sularahas maksmine",
+                ClientSize = new Size(360, 230),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+            var lMaksta = new Label { Text = "Maksta: " + maksta.ToString("0.00") + " €", Location = new Point(15, 15), AutoSize = true, Font = new Font("Segoe UI", 13, FontStyle.Bold) };
+            var l2 = new Label { Text = "Klient andis (€):", Location = new Point(15, 60), AutoSize = true };
+            var tb = new TextBox { Location = new Point(15, 85), Width = 330, Text = maksta.ToString("0.00") };
+            var lTagasi = new Label { Location = new Point(15, 125), Size = new Size(330, 30), Font = new Font("Segoe UI", 13, FontStyle.Bold) };
+            var ok = new Button { Text = "OK", Location = new Point(175, 180), Size = new Size(80, 34), DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = "Tühista", Location = new Point(265, 180), Size = new Size(80, 34), DialogResult = DialogResult.Cancel };
+
+            bool Loe(out decimal sisestatud) =>
+                decimal.TryParse(tb.Text.Trim().Replace(',', '.'), System.Globalization.NumberStyles.Number,
+                    System.Globalization.CultureInfo.InvariantCulture, out sisestatud);
+
+            void Uuenda()
+            {
+                if (Loe(out decimal a) && a >= maksta)
+                {
+                    lTagasi.Text = "Tagasi anda: " + (a - maksta).ToString("0.00") + " €";
+                    lTagasi.ForeColor = Color.SeaGreen;
+                    ok.Enabled = true;
+                }
+                else
+                {
+                    lTagasi.Text = "Antud summa on liiga väike";
+                    lTagasi.ForeColor = Color.Firebrick;
+                    ok.Enabled = false;
+                }
+            }
+            tb.TextChanged += (s, e) => Uuenda();
+            Uuenda();
+
+            f.Controls.AddRange(new Control[] { lMaksta, l2, tb, lTagasi, ok, cancel });
+            f.AcceptButton = ok;
+            f.CancelButton = cancel;
+            Teema.Rakenda(f);
+            if (f.ShowDialog(this) == DialogResult.OK && Loe(out decimal tulemus)) return tulemus;
+            return null;
+        }
+
         private void Maksa()
         {
             if (_korv.Count == 0)
             {
                 MessageBox.Show("Ostukorv on tühi.");
                 return;
+            }
+
+            decimal? andis = null;
+            if (comboMakse.SelectedItem.ToString() == "Sularahas")
+            {
+                andis = KysiSularaha(ArvutaMaksta());
+                if (andis == null) return;
             }
 
             try
@@ -408,7 +487,7 @@ namespace Tooded_DB
 
                 // 3) boonus: võta klient andmebaasist uuesti (värske boonus), arvuta kasutatud ja uus boonus
                 decimal kokku = _korv.Sum(r => r.Summa);
-                decimal kasutatud = 0, saadud = 0;
+                decimal kasutatud = 0, saadud = 0, sp = 0;
                 Klient klient = null;
                 if (_klient != null)
                 {
@@ -418,9 +497,16 @@ namespace Tooded_DB
                         MessageBox.Show("Klienti ei leitud enam andmebaasist.");
                         return;
                     }
-                    if (chkBoonus.Checked) kasutatud = Math.Min(klient.Boonus, kokku);
+                    sp = Allahindlus.SynnipaevaSoodus(klient, kokku);
+                    if (chkBoonus.Checked) kasutatud = Math.Min(klient.Boonus, kokku - sp);
                 }
-                decimal makstud = kokku - kasutatud;
+                decimal makstud = kokku - sp - kasutatud;
+                string makseviis = comboMakse.SelectedItem.ToString();
+                if (andis != null && andis < makstud)
+                {
+                    MessageBox.Show("Antud summa on väiksem kui maksta.");
+                    return;
+                }
                 if (klient != null)
                 {
                     saadud = Math.Round(makstud * BoonusMaar, 2);
@@ -429,7 +515,7 @@ namespace Tooded_DB
                 db.SaveChanges();
 
                 // 4) tšekk PDF-ina (kui see ebaõnnestub, jääb laoseis muutmata)
-                string tee = LooTsekk(klient, kokku, kasutatud, makstud, saadud);
+                string tee = LooTsekk(klient, kokku, sp, kasutatud, makstud, saadud, makseviis, andis);
 
                 // 5) müük ajalukku (Müügiajalugu vormi jaoks)
                 db.Muugid.Add(new Muuk
@@ -439,6 +525,8 @@ namespace Tooded_DB
                     KlientId = klient?.Id,
                     Kokku = kokku,
                     KasutatudBoonus = kasutatud,
+                    SynnipaevaSoodus = sp,
+                    Maksetuup = makseviis,
                     Makstud = makstud,
                     Arve = Path.GetFileName(tee)
                 });
@@ -446,7 +534,9 @@ namespace Tooded_DB
                 tx.Commit();
                 _viimaneTsekk = tee;
 
-                string teade = "Ost on sooritatud!\nMaksta: " + makstud.ToString("0.00") + " €";
+                string teade = "Ost on sooritatud!\nMakseviis: " + makseviis + "\nMaksta: " + makstud.ToString("0.00") + " €";
+                if (andis != null)
+                    teade += $"\nKlient andis: {andis:0.00} €\nTAGASI ANDA: {andis - makstud:0.00} €";
                 if (klient != null)
                     teade += $"\nBoonus: kasutatud {kasutatud:0.00} €, saadud {saadud:0.00} €, kokku {klient.Boonus:0.00} €";
                 teade += "\nTšekk on salvestatud:\n" + tee;
@@ -513,7 +603,7 @@ namespace Tooded_DB
             return f.ShowDialog(this) == DialogResult.OK ? tb.Text : null;
         }
 
-        private string LooTsekk(Klient klient, decimal kokku, decimal kasutatud, decimal makstud, decimal saadud)
+        private string LooTsekk(Klient klient, decimal kokku, decimal sp, decimal kasutatud, decimal makstud, decimal saadud, string makseviis, decimal? andis)
         {
             string kaust = Kaustad.Arved;
             Directory.CreateDirectory(kaust);
@@ -535,8 +625,10 @@ namespace Tooded_DB
             double h = page.Height.Point;
             double y = 40;
 
-            gfx.DrawString("Arve", fPealkiri, XBrushes.Black, new XRect(0, y, w, 30), XStringFormats.TopCenter);
-            y += 45;
+            gfx.DrawString("POOD", fPealkiri, XBrushes.Black, new XRect(0, y, w, 30), XStringFormats.TopCenter);
+            y += 28;
+            gfx.DrawString("Kassatšekk / Arve", fNormaalne, XBrushes.Black, new XRect(0, y, w, 18), XStringFormats.TopCenter);
+            y += 30;
             gfx.DrawString($"Kuupäev: {aeg:dd.MM.yyyy HH:mm}", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 18), XStringFormats.TopLeft);
             y += 20;
             gfx.DrawString($"Müüja: {AktiivneKasutaja.Nimi}", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 18), XStringFormats.TopLeft);
@@ -546,6 +638,8 @@ namespace Tooded_DB
                 gfx.DrawString($"Klient: {klient.Nimi}  (kaart {klient.Kliendikaart})", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 18), XStringFormats.TopLeft);
                 y += 20;
             }
+            gfx.DrawString($"Makseviis: {makseviis}", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 18), XStringFormats.TopLeft);
+            y += 20;
             y += 15;
 
             // tabeli päis
@@ -578,17 +672,32 @@ namespace Tooded_DB
             y += 12;
             gfx.DrawString("Kokku: " + kokku.ToString("0.00") + " €", fPaks, XBrushes.Black, new XRect(40, y, w - 80, 20), XStringFormats.TopRight);
             y += 22;
+            if (sp > 0)
+            {
+                gfx.DrawString("Sünnipäevasoodus (−10%): −" + sp.ToString("0.00") + " €", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 20), XStringFormats.TopRight);
+                y += 22;
+            }
             if (klient != null)
             {
                 gfx.DrawString("Kasutatud boonus: −" + kasutatud.ToString("0.00") + " €", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 20), XStringFormats.TopRight);
                 y += 22;
             }
-            gfx.DrawString("Maksta: " + makstud.ToString("0.00") + " €", fSuur, XBrushes.Black, new XRect(40, y, w - 80, 24), XStringFormats.TopRight);
+            gfx.DrawString(makseviis.StartsWith("Arvega") ? "Tasuda: " + makstud.ToString("0.00") + " € (14 päeva jooksul)" : "Maksta: " + makstud.ToString("0.00") + " €", fSuur, XBrushes.Black, new XRect(40, y, w - 80, 24), XStringFormats.TopRight);
             y += 30;
+            if (andis != null)
+            {
+                gfx.DrawString("Sularahas antud: " + andis.Value.ToString("0.00") + " €", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 20), XStringFormats.TopRight);
+                y += 22;
+                gfx.DrawString("Tagasi: " + (andis.Value - makstud).ToString("0.00") + " €", fPaks, XBrushes.Black, new XRect(40, y, w - 80, 20), XStringFormats.TopRight);
+                y += 28;
+            }
             if (klient != null)
             {
                 gfx.DrawString("Saadud boonus: +" + saadud.ToString("0.00") + " €   Boonus kokku: " + klient.Boonus.ToString("0.00") + " €", fNormaalne, XBrushes.Black, new XRect(40, y, w - 80, 20), XStringFormats.TopRight);
+                y += 22;
             }
+            y += 20;
+            gfx.DrawString("Täname ostu eest!", fPaks, XBrushes.Black, new XRect(0, y, w, 20), XStringFormats.TopCenter);
 
             gfx.Dispose();
             doc.Save(tee);

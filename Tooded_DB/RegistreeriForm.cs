@@ -38,7 +38,7 @@ namespace Tooded_DB
             txtParool2 = new TextBox { Location = new Point(20, 185), Width = 300, PasswordChar = '*' };
             var l4 = new Label { Text = "Roll", Location = new Point(20, 220), AutoSize = true };
             comboRoll = new ComboBox { Location = new Point(20, 240), Width = 300, DropDownStyle = ComboBoxStyle.DropDownList };
-            comboRoll.Items.AddRange(new object[] { Rollid.Muuja, Rollid.Omanik });
+            comboRoll.Items.AddRange(new object[] { Rollid.Muuja, Rollid.Omanik, Rollid.Klient });
             comboRoll.SelectedIndex = 0;
 
             lblViga = new Label { Location = new Point(20, 275), Size = new Size(300, 40), ForeColor = Color.Firebrick };
@@ -50,6 +50,7 @@ namespace Tooded_DB
             Controls.AddRange(new Control[] { pealkiri, l1, txtNimi, l2, txtParool, l3, txtParool2, l4, comboRoll, lblViga, btnOk, btnTuhista });
             AcceptButton = btnOk;
             CancelButton = btnTuhista;
+            Teema.Rakenda(this);
         }
 
         private void btnOk_Click(object sender, EventArgs e)

@@ -10,6 +10,74 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\v18\DocumentLayout.backup.json" />
+	  <Content Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\v18\DocumentLayout.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Tooded-DB-repo\.git\COMMIT_EDITMSG" />
+	  <None Include="Tooded-DB-repo\.git\config" />
+	  <None Include="Tooded-DB-repo\.git\description" />
+	  <None Include="Tooded-DB-repo\.git\HEAD" />
+	  <None Include="Tooded-DB-repo\.git\hooks\applypatch-msg.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\commit-msg.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\fsmonitor-watchman.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\post-update.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\pre-applypatch.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\pre-commit.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\pre-merge-commit.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\pre-push.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\pre-rebase.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\pre-receive.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\prepare-commit-msg.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\push-to-checkout.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\sendemail-validate.sample" />
+	  <None Include="Tooded-DB-repo\.git\hooks\update.sample" />
+	  <None Include="Tooded-DB-repo\.git\index" />
+	  <None Include="Tooded-DB-repo\.git\info\exclude" />
+	  <None Include="Tooded-DB-repo\.git\logs\HEAD" />
+	  <None Include="Tooded-DB-repo\.git\logs\refs\heads\tooded-db" />
+	  <None Include="Tooded-DB-repo\.git\logs\refs\remotes\origin\HEAD" />
+	  <None Include="Tooded-DB-repo\.git\logs\refs\remotes\origin\tooded-db" />
+	  <None Include="Tooded-DB-repo\.git\objects\09\55e33e49f12026668031b798388ddb0f318211" />
+	  <None Include="Tooded-DB-repo\.git\objects\18\1e262d92c5c9fb39ccf4b8e3728baeddffd97c" />
+	  <None Include="Tooded-DB-repo\.git\objects\22\d6d561dcf55564e3b74b3f4f68ddf50a050585" />
+	  <None Include="Tooded-DB-repo\.git\objects\56\1c32ef93790d1e13b34fbe38893ad3c0fff472" />
+	  <None Include="Tooded-DB-repo\.git\objects\6a\2133fb7a772a17a8e397a401ee91dbe40f59c2" />
+	  <None Include="Tooded-DB-repo\.git\objects\89\0893579642976df01a8128df73160d9e3e011b" />
+	  <None Include="Tooded-DB-repo\.git\objects\97\f38ec003ad3f608942dde4f79da8aa3efd678a" />
+	  <None Include="Tooded-DB-repo\.git\objects\a5\37c3e4c05d315fe5b4b8f56856724be05cce5b" />
+	  <None Include="Tooded-DB-repo\.git\objects\a8\d843a3c217047e9df56721623176175d10fc16" />
+	  <None Include="Tooded-DB-repo\.git\objects\af\884bedd49c04469391aeddb45b402399387052" />
+	  <None Include="Tooded-DB-repo\.git\objects\bd\e895b21a4a7b5b6a9b15eda06809e136edd960" />
+	  <None Include="Tooded-DB-repo\.git\objects\c3\e7c0a534a72760b097ac183fa526091bb06bbb" />
+	  <None Include="Tooded-DB-repo\.git\objects\d2\f33c06352af3b7637083e03eaae571ddcc940e" />
+	  <None Include="Tooded-DB-repo\.git\objects\ec\b1b6240cf8e72290c2908e7657cbc60460dfd9" />
+	  <None Include="Tooded-DB-repo\.git\objects\f0\1604911907c38c7a2776984f4731d6fea3f000" />
+	  <None Include="Tooded-DB-repo\.git\objects\pack\pack-4e52d448918e518828e34e5c931af7f5fb80bd21.idx" />
+	  <None Include="Tooded-DB-repo\.git\objects\pack\pack-4e52d448918e518828e34e5c931af7f5fb80bd21.pack" />
+	  <None Include="Tooded-DB-repo\.git\objects\pack\pack-4e52d448918e518828e34e5c931af7f5fb80bd21.rev" />
+	  <None Include="Tooded-DB-repo\.git\packed-refs" />
+	  <None Include="Tooded-DB-repo\.git\refs\heads\tooded-db" />
+	  <None Include="Tooded-DB-repo\.git\refs\remotes\origin\HEAD" />
+	  <None Include="Tooded-DB-repo\.git\refs\remotes\origin\tooded-db" />
+	  <None Include="Tooded-DB-repo\.vs\ProjectEvaluation\tooded_db.metadata.v10.bin" />
+	  <None Include="Tooded-DB-repo\.vs\ProjectEvaluation\tooded_db.projects.v10.bin" />
+	  <None Include="Tooded-DB-repo\.vs\ProjectEvaluation\tooded_db.strings.v10.bin" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\DesignTimeBuild\.dtbcache.v2" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\FileContentIndex\5111688a-8251-49a2-ba1c-6bdc42d83d77.vsidx" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\FileContentIndex\6666c321-4b4f-4d22-a39a-e30e67d2b91f.vsidx" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\FileContentIndex\a870ed5d-a0ff-489d-9891-ecdf34c25108.vsidx" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\FileContentIndex\b4867dfa-624e-4dd6-aa34-a1cd42d4f010.vsidx" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\FileContentIndex\c9e3d6a2-6ca8-4db4-80f8-aadcbcf5cfe7.vsidx" />
+	  <None Include="Tooded-DB-repo\.vs\Tooded_DB.slnx\v18\.futdcache.v2" />
+	  <None Include="Tooded-DB-repo\Tooded_DB.slnx" />
+	  <None Include="Tooded-DB-repo\Tooded_DB\Properties\PublishProfiles\FolderProfile.pubxml.user" />
+	  <None Include="Tooded-DB-repo\Tooded_DB\Tooded_DB.csproj" />
+	  <None Include="Tooded-DB-repo\Tooded_DB\Tooded_DB.csproj.user" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
@@ -24,6 +92,11 @@
 		<None Update="Images\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Tooded-DB-repo\.git\objects\info\" />
+	  <Folder Include="Tooded-DB-repo\.git\refs\tags\" />
 	</ItemGroup>
 
 </Project>

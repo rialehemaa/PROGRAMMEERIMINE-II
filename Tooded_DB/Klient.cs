@@ -12,6 +12,7 @@ namespace Tooded_DB
         public string Email { get; set; }
         public string Telefon { get; set; }
         public string Kliendikaart { get; set; }   // kaardi number, nt K123456
+        public DateTime? Synnipaev { get; set; }   // sünnipäev (−10% 3 päeva enne ja pärast)
         public decimal Boonus { get; set; }        // kogutud boonus eurodes
     }
 }

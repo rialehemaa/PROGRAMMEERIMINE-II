@@ -70,6 +70,43 @@ namespace Tooded_DB
                     new Toode { Toodenimetus = "Monster", Kogus = 4, Hind = 2.5f, Pilt = "monster.jpg", KategooriaId = KatId("Energiajoogid") });
             }
 
+            // 20 lisatoodet (4 igasse kategooriasse); lisatakse nime järgi, kui veel puudub
+            {
+                int KatId2(string nimi) => db.Kategooriatabel.First(k => k.Kategooria_nimetus == nimi).Id;
+                var lisa = new (string nimi, int kogus, float hind, string pilt, string kat)[]
+                {
+                    ("Jogurt", 20, 0.99f, "jogurt.jpg", "Piimatooted"),
+                    ("Edami juust", 12, 3.49f, "juust.jpg", "Piimatooted"),
+                    ("Või", 15, 2.79f, "voi.jpg", "Piimatooted"),
+                    ("Kohupiim", 14, 1.39f, "kohupiim.jpg", "Piimatooted"),
+                    ("Kanafilee", 10, 6.99f, "kanafilee.jpg", "Liha"),
+                    ("Hakkliha", 9, 4.99f, "hakkliha.jpg", "Liha"),
+                    ("Vorstid", 16, 3.29f, "vorstid.jpg", "Liha"),
+                    ("Seakaelakarbonaad", 8, 5.49f, "seakael.jpg", "Liha"),
+                    ("Banaan", 30, 1.29f, "banaan.jpg", "Puuviljad"),
+                    ("Apelsin", 25, 1.59f, "apelsin.jpg", "Puuviljad"),
+                    ("Viinamarjad", 12, 2.99f, "viinamari.jpg", "Puuviljad"),
+                    ("Pirn", 18, 1.89f, "pirn.jpg", "Puuviljad"),
+                    ("Mineraalvesi", 40, 0.69f, "mineraalvesi.jpg", "Joogid"),
+                    ("Ice Tea", 22, 1.49f, "icetea.jpg", "Joogid"),
+                    ("Sprite", 24, 1.79f, "sprite.jpg", "Joogid"),
+                    ("Fanta", 24, 1.79f, "fanta.jpg", "Joogid"),
+                    ("Red Bull", 20, 1.99f, "redbull.jpg", "Energiajoogid"),
+                    ("Burn", 18, 1.69f, "burn.jpg", "Energiajoogid"),
+                    ("Hell", 18, 1.39f, "hell.jpg", "Energiajoogid"),
+                    ("Nocco", 15, 2.29f, "nocco.jpg", "Energiajoogid"),
+                };
+                foreach (var x in lisa)
+                {
+                    if (!db.Toodetabel.Any(t => t.Toodenimetus == x.nimi))
+                        db.Toodetabel.Add(new Toode { Toodenimetus = x.nimi, Kogus = x.kogus, Hind = x.hind, Pilt = x.pilt, KategooriaId = KatId2(x.kat) });
+                }
+            }
+
+            // kasutaja, kes näeb ainult nädala pakkumisi
+            if (!db.Kasutajad.Any(k => k.Kasutajanimi == "klient"))
+                db.Kasutajad.Add(new Kasutaja { Kasutajanimi = "klient", ParoolHash = PasswordHelper.Hash("klient123"), Roll = Rollid.Klient });
+
             if (!db.Kasutajad.Any())
             {
                 db.Kasutajad.AddRange(

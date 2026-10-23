@@ -19,6 +19,8 @@ namespace Tooded_DB
             tabPood = new TabControl { Dock = DockStyle.Fill };
             Controls.Add(tabPood);
 
+            Shown += (s, e) => Teema.Rakenda(this);
+
             Load += (s, e) => LaeKategooriadJaPildid();
             FormClosed += (s, e) => VabastaPildid();
         }

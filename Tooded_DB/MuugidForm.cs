@@ -34,6 +34,7 @@ namespace Tooded_DB
 
             Controls.Add(grid);
             Controls.Add(lblKokku);
+            Teema.Rakenda(this);
 
             Load += (s, e) =>
             {
@@ -65,6 +66,8 @@ namespace Tooded_DB
                         Klient = m.Klient?.Nimi,
                         Kokku = m.Kokku,
                         Boonus = m.KasutatudBoonus,
+                        Sünnipäevasoodus = m.SynnipaevaSoodus,
+                        Makseviis = m.Maksetuup,
                         Makstud = m.Makstud,
                         Arve = m.Arve
                     })

@@ -15,6 +15,8 @@ namespace Tooded_DB
         public Klient Klient { get; set; }
         public decimal Kokku { get; set; }            // ostukorvi summa
         public decimal KasutatudBoonus { get; set; }  // kui palju boonust kasutati
+        public decimal SynnipaevaSoodus { get; set; } // sünnipäevasoodus eurodes
+        public string Maksetuup { get; set; }         // kuidas maksti (sularahas, kaardiga, arvega...)
         public decimal Makstud { get; set; }          // tegelikult makstud summa
         public string Arve { get; set; }              // PDF-faili nimi kaustas Arved
     }

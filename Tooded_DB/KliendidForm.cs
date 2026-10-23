@@ -10,6 +10,7 @@ namespace Tooded_DB
     {
         private DataGridView grid;
         private TextBox txtOtsi, txtNimi, txtEmail, txtTelefon, txtKaart, txtBoonus;
+        private DateTimePicker dtSynnipaev;
         private int? _valitudId;
 
         public KliendidForm()
@@ -19,6 +20,7 @@ namespace Tooded_DB
             ClientSize = new Size(1000, 540);
 
             EhitaUi();
+            Teema.Rakenda(this);
             Load += (s, e) =>
             {
                 if (!AktiivneKasutaja.OnOmanik)
@@ -61,6 +63,9 @@ namespace Tooded_DB
             var l2 = L("E-post"); txtEmail = T();
             var l3 = L("Telefon"); txtTelefon = T();
             var l4 = L("Kliendikaart (tühi = loo automaatselt)"); txtKaart = T();
+            var l6 = L("Sünnipäev (tühi = pole teada)");
+            dtSynnipaev = new DateTimePicker { Location = new Point(x, y), Width = 300, Format = DateTimePickerFormat.Short, ShowCheckBox = true, MaxDate = DateTime.Today, Checked = false };
+            y += 38;
             var l5 = L("Boonus (€)"); txtBoonus = T();
             txtBoonus.Text = "0";
 
@@ -75,7 +80,7 @@ namespace Tooded_DB
 
             Controls.AddRange(new Control[]
             {
-                lOtsi, txtOtsi, grid, l1, txtNimi, l2, txtEmail, l3, txtTelefon, l4, txtKaart, l5, txtBoonus,
+                lOtsi, txtOtsi, grid, l1, txtNimi, l2, txtEmail, l3, txtTelefon, l4, txtKaart, l6, dtSynnipaev, l5, txtBoonus,
                 btnLisa, btnUuenda, btnKustuta, btnTuhjenda
             });
         }
@@ -90,8 +95,9 @@ namespace Tooded_DB
                 if (otsi != "") q = q.Where(k => k.Nimi.Contains(otsi) || k.Kliendikaart.Contains(otsi));
 
                 grid.DataSource = q.OrderBy(k => k.Nimi)
-                    .Select(k => new { k.Id, k.Nimi, k.Email, k.Telefon, k.Kliendikaart, k.Boonus })
+                    .Select(k => new { k.Id, k.Nimi, k.Email, k.Telefon, k.Kliendikaart, k.Synnipaev, k.Boonus })
                     .ToList();
+                if (grid.Columns["Synnipaev"] != null) grid.Columns["Synnipaev"].DefaultCellStyle.Format = "dd.MM.yyyy";
                 if (grid.Columns["Boonus"] != null) grid.Columns["Boonus"].DefaultCellStyle.Format = "0.00";
             }
             catch (Exception ex)
@@ -109,6 +115,9 @@ namespace Tooded_DB
             txtEmail.Text = r.Cells["Email"].Value?.ToString();
             txtTelefon.Text = r.Cells["Telefon"].Value?.ToString();
             txtKaart.Text = r.Cells["Kliendikaart"].Value?.ToString();
+            var sp = r.Cells["Synnipaev"].Value as DateTime?;
+            dtSynnipaev.Checked = sp != null;
+            if (sp != null) dtSynnipaev.Value = sp.Value;
             txtBoonus.Text = Convert.ToDecimal(r.Cells["Boonus"].Value).ToString("0.00");
         }
 
@@ -116,6 +125,7 @@ namespace Tooded_DB
         {
             _valitudId = null;
             txtNimi.Clear(); txtEmail.Clear(); txtTelefon.Clear(); txtKaart.Clear();
+            dtSynnipaev.Checked = false;
             txtBoonus.Text = "0";
         }
 
@@ -173,6 +183,7 @@ namespace Tooded_DB
                     Email = txtEmail.Text.Trim(),
                     Telefon = txtTelefon.Text.Trim(),
                     Kliendikaart = kaart,
+                    Synnipaev = dtSynnipaev.Checked ? dtSynnipaev.Value.Date : (DateTime?)null,
                     Boonus = boonus
                 });
                 db.SaveChanges();
@@ -208,6 +219,7 @@ namespace Tooded_DB
                 k.Email = txtEmail.Text.Trim();
                 k.Telefon = txtTelefon.Text.Trim();
                 k.Kliendikaart = kaart;
+                k.Synnipaev = dtSynnipaev.Checked ? dtSynnipaev.Value.Date : (DateTime?)null;
                 k.Boonus = boonus;
                 db.SaveChanges();
                 LaeKliendid();
