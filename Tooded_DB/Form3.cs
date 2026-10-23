@@ -27,7 +27,7 @@ namespace Tooded_DB
         private static Image LaePilt(string failinimi)
         {
             if (string.IsNullOrEmpty(failinimi)) return null;
-            string tee = Path.Combine(AppContext.BaseDirectory, "Images", failinimi);
+            string tee = Path.Combine(Kaustad.Pildid, failinimi);
             if (!File.Exists(tee)) return null;
             try
             {

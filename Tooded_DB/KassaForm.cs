@@ -238,7 +238,7 @@ namespace Tooded_DB
         private Image LaePilt(string failinimi)
         {
             if (string.IsNullOrEmpty(failinimi)) return null;
-            string tee = Path.Combine(AppContext.BaseDirectory, "Images", failinimi);
+            string tee = Path.Combine(Kaustad.Pildid, failinimi);
             if (!File.Exists(tee)) return null;
 
             try
@@ -515,7 +515,7 @@ namespace Tooded_DB
 
         private string LooTsekk(Klient klient, decimal kokku, decimal kasutatud, decimal makstud, decimal saadud)
         {
-            string kaust = Path.Combine(AppContext.BaseDirectory, "Arved");
+            string kaust = Kaustad.Arved;
             Directory.CreateDirectory(kaust);
 
             DateTime aeg = DateTime.Now;
