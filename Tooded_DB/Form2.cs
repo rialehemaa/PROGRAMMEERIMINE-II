@@ -58,8 +58,8 @@ namespace Tooded_DB
         // Kopeerib pildi Images kausta (kui see pole juba seal)
         private void KopeeriPilt(string allikas, string failinimi)
         {
-            Directory.CreateDirectory("Images");
-            string siht = Path.GetFullPath(Path.Combine("Images", failinimi));
+            Directory.CreateDirectory(Kaustad.Pildid);
+            string siht = Path.GetFullPath(Path.Combine(Kaustad.Pildid, failinimi));
             if (!string.Equals(Path.GetFullPath(allikas), siht, StringComparison.OrdinalIgnoreCase))
                 File.Copy(allikas, siht, true);
         }
@@ -72,7 +72,7 @@ namespace Tooded_DB
             vana?.Dispose();
 
             if (string.IsNullOrEmpty(failinimi)) return;
-            string tee = Path.Combine("Images", failinimi);
+            string tee = Path.Combine(Kaustad.Pildid, failinimi);
             if (!File.Exists(tee)) return;
 
             picturePilt.Image = LaePilt(tee);

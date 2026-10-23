@@ -85,7 +85,7 @@ namespace Tooded_DB
             string arve = grid.Rows[e.RowIndex].Cells["Arve"].Value?.ToString();
             if (string.IsNullOrEmpty(arve)) return;
 
-            string tee = Path.Combine(AppContext.BaseDirectory, "Arved", arve);
+            string tee = Path.Combine(Kaustad.Arved, arve);
             if (!File.Exists(tee))
             {
                 MessageBox.Show("PDF-faili ei leitud kaustast Arved.");
