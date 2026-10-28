@@ -16,13 +16,15 @@ namespace Tooded_DB
             Directory.CreateDirectory(Pildid);
             Directory.CreateDirectory(Arved);
 
-            // rakendusega kaasa tulnud pildid kopeeritakse kasutaja kausta (kui neid seal veel pole)
+            // rakendusega kaasa tulnud pildid kopeeritakse kasutaja kausta (kui neid seal veel pole
+            // või kui fail on teistsugune, nt uuendatud pilt)
             string algsed = Path.Combine(AppContext.BaseDirectory, "Images");
             if (!Directory.Exists(algsed)) return;
             foreach (var fail in Directory.GetFiles(algsed))
             {
                 string siht = Path.Combine(Pildid, Path.GetFileName(fail));
-                if (!File.Exists(siht)) File.Copy(fail, siht);
+                if (!File.Exists(siht) || new FileInfo(siht).Length != new FileInfo(fail).Length)
+                    File.Copy(fail, siht, true);
             }
         }
     }

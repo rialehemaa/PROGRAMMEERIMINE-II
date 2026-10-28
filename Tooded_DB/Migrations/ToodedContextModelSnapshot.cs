@@ -35,6 +35,9 @@ namespace Tooded_DB.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("KlientId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ParoolHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -111,6 +114,39 @@ namespace Tooded_DB.Migrations
                     b.ToTable("Kliendid", (string)null);
                 });
 
+            modelBuilder.Entity("Tooded_DB.MuugiRida", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Kogus")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<int>("MuukId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Summa")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Toode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ToodeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MuukId");
+
+                    b.ToTable("MuugiRead", (string)null);
+                });
+
             modelBuilder.Entity("Tooded_DB.Muuk", b =>
                 {
                     b.Property<int>("Id")
@@ -141,14 +177,26 @@ namespace Tooded_DB.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Maksetuup")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Makstud")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("SynnipaevaSoodus")
+                    b.Property<decimal>("SaadudBoonus")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SynnipaevaSoodus")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Tagastatud")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("TagastatudAeg")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -157,6 +205,53 @@ namespace Tooded_DB.Migrations
                     b.HasIndex("KlientId");
 
                     b.ToTable("Muugid", (string)null);
+                });
+
+            modelBuilder.Entity("Tooded_DB.Pakkumine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Alates")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Kogus")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("KomplektHind")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("Kuni")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Protsent")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Tasuta")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Toode2Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToodeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tuup")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Toode2Id");
+
+                    b.HasIndex("ToodeId");
+
+                    b.ToTable("Pakkumised", (string)null);
                 });
 
             modelBuilder.Entity("Tooded_DB.Toode", b =>
@@ -173,8 +268,9 @@ namespace Tooded_DB.Migrations
                     b.Property<int>("KategooriaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Kogus")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Kogus")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
 
                     b.Property<string>("Pilt")
                         .HasColumnType("nvarchar(max)");
@@ -182,17 +278,41 @@ namespace Tooded_DB.Migrations
                     b.Property<int>("Soodus")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("SoodusAlates")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("SoodusKuni")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Toodenimetus")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("TukiKaal")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("Uhik")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("tk");
+
                     b.HasKey("Id");
 
                     b.HasIndex("KategooriaId");
 
                     b.ToTable("Toodetabel", (string)null);
+                });
+
+            modelBuilder.Entity("Tooded_DB.MuugiRida", b =>
+                {
+                    b.HasOne("Tooded_DB.Muuk", "Muuk")
+                        .WithMany("Read")
+                        .HasForeignKey("MuukId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Muuk");
                 });
 
             modelBuilder.Entity("Tooded_DB.Muuk", b =>
@@ -212,6 +332,24 @@ namespace Tooded_DB.Migrations
                     b.Navigation("Klient");
                 });
 
+            modelBuilder.Entity("Tooded_DB.Pakkumine", b =>
+                {
+                    b.HasOne("Tooded_DB.Toode", "Toode2")
+                        .WithMany()
+                        .HasForeignKey("Toode2Id")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Tooded_DB.Toode", "Toode")
+                        .WithMany()
+                        .HasForeignKey("ToodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Toode");
+
+                    b.Navigation("Toode2");
+                });
+
             modelBuilder.Entity("Tooded_DB.Toode", b =>
                 {
                     b.HasOne("Tooded_DB.Kategooria", "Kategooria")
@@ -226,6 +364,11 @@ namespace Tooded_DB.Migrations
             modelBuilder.Entity("Tooded_DB.Kategooria", b =>
                 {
                     b.Navigation("Tooded");
+                });
+
+            modelBuilder.Entity("Tooded_DB.Muuk", b =>
+                {
+                    b.Navigation("Read");
                 });
 #pragma warning restore 612, 618
         }

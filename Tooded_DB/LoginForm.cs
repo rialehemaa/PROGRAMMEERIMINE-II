@@ -19,7 +19,7 @@ namespace Tooded_DB
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            ClientSize = new Size(340, 270);
+            ClientSize = new Size(340, 280);
 
             var pealkiri = new Label
             {
@@ -46,7 +46,12 @@ namespace Tooded_DB
             btnRegistreeri = new Button { Text = "Registreeri", Location = new Point(180, 215), Size = new Size(140, 34) };
             btnRegistreeri.Click += btnRegistreeri_Click;
 
-            Controls.AddRange(new Control[] { pealkiri, l1, txtNimi, l2, txtParool, lblViga, btnLogin, btnRegistreeri });
+            var keeleValik = Keel.Valik(this);
+            keeleValik.Location = new Point(235, 14);
+            keeleValik.Width = 85;
+            pealkiri.Font = new Font(Font.FontFamily, 11, FontStyle.Bold);
+
+            Controls.AddRange(new Control[] { pealkiri, keeleValik, l1, txtNimi, l2, txtParool, lblViga, btnLogin, btnRegistreeri });
             AcceptButton = btnLogin;
             Teema.Rakenda(this);
         }
@@ -60,7 +65,7 @@ namespace Tooded_DB
 
             if (nimi == "" || parool == "")
             {
-                lblViga.Text = "Sisesta kasutajanimi ja parool!";
+                lblViga.Text = Keel.T("Sisesta kasutajanimi ja parool!");
                 return;
             }
 
@@ -71,12 +76,12 @@ namespace Tooded_DB
 
                 if (kasutaja == null)
                 {
-                    lblViga.Text = "Sellist kasutajat pole!";
+                    lblViga.Text = Keel.T("Sellist kasutajat pole!");
                     return;
                 }
                 if (!PasswordHelper.Verify(parool, kasutaja.ParoolHash))
                 {
-                    lblViga.Text = "Vale parool!";
+                    lblViga.Text = Keel.T("Vale parool!");
                     return;
                 }
 
@@ -100,7 +105,7 @@ namespace Tooded_DB
                 txtParool.Clear();
                 txtParool.Focus();
                 lblViga.ForeColor = Color.SeaGreen;
-                lblViga.Text = "Kasutaja loodud. Logi sisse.";
+                lblViga.Text = Keel.T("Kasutaja loodud. Logi sisse.");
             }
         }
     }

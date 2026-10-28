@@ -5,12 +5,12 @@ namespace Tooded_DB
     public static class Sisend
     {
         // Tagastab null, kui kõik on korras, muidu veateate
-        public static string KontrolliKogus(string tekst, out int kogus)
+        public static string KontrolliKogus(string tekst, out decimal kogus)
         {
             kogus = 0;
             if (string.IsNullOrWhiteSpace(tekst)) return "Sisesta kogus!";
-            if (!int.TryParse(tekst.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out kogus))
-                return "Kogus peab olema täisarv!";
+            if (!decimal.TryParse(tekst.Trim().Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out kogus))
+                return "Kogus peab olema arv!";
             if (kogus < 0) return "Kogus ei tohi olla negatiivne!";
             return null;
         }

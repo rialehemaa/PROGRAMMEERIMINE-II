@@ -19,5 +19,21 @@ namespace Tooded_DB
         public string Maksetuup { get; set; }         // kuidas maksti (sularahas, kaardiga, arvega...)
         public decimal Makstud { get; set; }          // tegelikult makstud summa
         public string Arve { get; set; }              // PDF-faili nimi kaustas Arved
+        public decimal SaadudBoonus { get; set; }     // selle ostuga kogutud boonus (tagastamisel võetakse tagasi)
+        public bool Tagastatud { get; set; }          // true = ost on tagastatud
+        public DateTime? TagastatudAeg { get; set; }
+        public List<MuugiRida> Read { get; set; } = new List<MuugiRida>();
+    }
+
+    // Müügi rida (mida osteti), vajalik tagastamiseks
+    public class MuugiRida
+    {
+        public int Id { get; set; }
+        public int MuukId { get; set; }
+        public Muuk Muuk { get; set; }
+        public int ToodeId { get; set; }
+        public string Toode { get; set; }
+        public decimal Kogus { get; set; }
+        public decimal Summa { get; set; }   // rea summa pärast soodusi
     }
 }

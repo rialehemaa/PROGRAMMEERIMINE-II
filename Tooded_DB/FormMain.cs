@@ -6,84 +6,66 @@
         {
             Text = "Peamenüü";
             StartPosition = FormStartPosition.CenterScreen;
-            ClientSize = new Size(300, 560);
-            MinimumSize = new Size(320, 600);
+
+            string roll = AktiivneKasutaja.Roll;
+            bool omanik = roll == Rollid.Omanik;
+            bool muuja = roll == Rollid.Muuja;
+            bool klient = roll == Rollid.Klient;
 
             var tere = new Label
             {
-                Text = $"Tere, {AktiivneKasutaja.Nimi}!   Roll: {AktiivneKasutaja.Roll}",
-                Location = new Point(30, 15),
-                AutoSize = true
+                Text = $"Tere, {AktiivneKasutaja.Nimi}!   Roll: {roll}",
+                Dock = DockStyle.Fill,
+                Padding = new Padding(14, 12, 0, 0)
             };
+            var ylaPaneel = new Panel { Dock = DockStyle.Top, Height = 44 };
+            var keeleValik = Keel.Valik(this);
+            keeleValik.Dock = DockStyle.Right;
+            ylaPaneel.Controls.Add(tere);
+            ylaPaneel.Controls.Add(keeleValik);
 
-            var btnKassa = new Button { Text = "Kassa", Location = new Point(30, 50), Size = new Size(240, 45) };
-            btnKassa.Click += (s, e) =>
+            // Iga roll näeb ainult neid nuppe, millega ta saab töötada (ülejäänud on peidetud)
+            var nupud = new List<(string tekst, Action ava)>();
+            if (omanik || muuja) nupud.Add(("Kassa", () => { using var f = new KassaForm(); f.ShowDialog(this); }));
+            nupud.Add(("Pood", () => { using var f = new Form3(); f.ShowDialog(this); }));                       // toodete vaatamine
+            if (omanik) nupud.Add(("Ladu (haldus)", () => { using var f = new Form2(); f.ShowDialog(this); }));   // laoseis, toodete lisamine/muutmine
+            if (omanik) nupud.Add(("Kliendid (admin)", () => { using var f = new KliendidForm(); f.ShowDialog(this); }));
+            if (muuja) nupud.Add(("Kliendid (admin)", () => { using var f = new KliendidForm(); f.ShowDialog(this); }));
+            if (omanik || muuja) nupud.Add(("Müügiajalugu", () => { using var f = new MuugidForm(); f.ShowDialog(this); }));
+            if (omanik || klient) nupud.Add(("Veebipood", () => { using var f = new KassaForm(true); f.ShowDialog(this); }));
+            if (omanik || muuja) nupud.Add(("Pakkumised (haldus)", () => { using var f = new PakkumisedForm(true); f.ShowDialog(this); }));
+            if (omanik || klient) nupud.Add(("Nädala pakkumised", () => { using var f = new PakkumisedForm(false); f.ShowDialog(this); }));
+            if (omanik || klient) nupud.Add(("Ostunimekiri", () => { using var f = new OstunimekiriForm(); f.ShowDialog(this); }));
+            if (klient) nupud.Add(("Ostuajalugu", () => { using var f = new OstudForm(); f.ShowDialog(this); }));
+
+            var tabel = new TableLayoutPanel
             {
-                using var f = new KassaForm();
-                f.ShowDialog(this);
+                Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = nupud.Count + 1,
+                Padding = new Padding(14, 4, 14, 14)
             };
+            tabel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-            var btnTooted = new Button { Text = "Tooted (haldus)", Location = new Point(30, 105), Size = new Size(240, 45) };
-            btnTooted.Click += (s, e) =>
+            foreach (var n in nupud)
             {
-                using var f = new Form2();
-                f.ShowDialog(this);
-            };
+                var b = new Button { Text = n.tekst, Dock = DockStyle.Fill, Margin = new Padding(0, 5, 0, 5) };
+                var ava = n.ava;
+                b.Click += (s, e) => ava();
+                tabel.RowStyles.Add(new RowStyle(SizeType.Percent, 100f / (nupud.Count + 1)));
+                tabel.Controls.Add(b);
+            }
 
-            var btnKliendid = new Button { Text = "Kliendid (admin)", Location = new Point(30, 160), Size = new Size(240, 45) };
-            btnKliendid.Click += (s, e) =>
-            {
-                using var f = new KliendidForm();
-                f.ShowDialog(this);
-            };
-
-            var btnMuugid = new Button { Text = "Müügiajalugu", Location = new Point(30, 215), Size = new Size(240, 45) };
-            btnMuugid.Click += (s, e) =>
-            {
-                using var f = new MuugidForm();
-                f.ShowDialog(this);
-            };
-
-            var btnPood = new Button { Text = "Pood", Location = new Point(30, 270), Size = new Size(240, 45) };
-            btnPood.Click += (s, e) =>
-            {
-                using var f = new Form3();
-                f.ShowDialog(this);
-            };
-
-            var btnSoodused = new Button { Text = "Soodused (haldus)", Location = new Point(30, 325), Size = new Size(240, 45) };
-            btnSoodused.Click += (s, e) =>
-            {
-                using var f = new SoodusedForm(true);
-                f.ShowDialog(this);
-            };
-
-            var btnPakkumised = new Button { Text = "Nädala pakkumised", Location = new Point(30, 380), Size = new Size(240, 45) };
-            btnPakkumised.Click += (s, e) =>
-            {
-                using var f = new SoodusedForm(false);
-                f.ShowDialog(this);
-            };
-
-            var btnNimekiri = new Button { Text = "Ostunimekiri", Location = new Point(30, 435), Size = new Size(240, 45) };
-            btnNimekiri.Click += (s, e) =>
-            {
-                using var f = new OstunimekiriForm();
-                f.ShowDialog(this);
-            };
-
-            var btnValja = new Button { Text = "Logi välja", Location = new Point(30, 495), Size = new Size(240, 40) };
+            var btnValja = new Button { Text = "Logi välja", Dock = DockStyle.Fill, Margin = new Padding(0, 5, 0, 5) };
             btnValja.Click += (s, e) => { DialogResult = DialogResult.Retry; };
+            tabel.RowStyles.Add(new RowStyle(SizeType.Percent, 100f / (nupud.Count + 1)));
+            tabel.Controls.Add(btnValja);
 
-            // Omanikul on täielik juurdepääs (Tooted + Kassa), müüjale on kättesaadav ainult Kassa
-            btnTooted.Enabled = AktiivneKasutaja.OnOmanik;
-            btnKliendid.Enabled = AktiivneKasutaja.OnOmanik;
-            btnMuugid.Enabled = AktiivneKasutaja.OnOmanik;
-            // Klient (ostja) näeb ainult poodi ja nädala pakkumisi
-            btnKassa.Enabled = !AktiivneKasutaja.OnKlient;
-            btnSoodused.Enabled = !AktiivneKasutaja.OnKlient;
+            Controls.Add(tabel);
+            Controls.Add(ylaPaneel);
 
-            Controls.AddRange(new Control[] { tere, btnKassa, btnTooted, btnKliendid, btnMuugid, btnPood, btnSoodused, btnPakkumised, btnNimekiri, btnValja });
+            ClientSize = new Size(360, 64 + (nupud.Count + 1) * 56);
+            MinimumSize = new Size(300, 64 + (nupud.Count + 1) * 44);
             Teema.Rakenda(this);
         }
     }
