@@ -12,6 +12,8 @@ namespace Tooded_DB
         public DbSet<Kasutaja> Kasutajad { get; set; }
         public DbSet<Klient> Kliendid { get; set; }
         public DbSet<Muuk> Muugid { get; set; }
+        public DbSet<Pakkumine> Pakkumised { get; set; }
+        public DbSet<MuugiRida> MuugiRead { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,7 +24,13 @@ namespace Tooded_DB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Kategooria>().ToTable("Kategooriatabel");
-            modelBuilder.Entity<Toode>().ToTable("Toodetabel");
+            modelBuilder.Entity<Toode>(e =>
+            {
+                e.ToTable("Toodetabel");
+                e.Property(t => t.Kogus).HasPrecision(18, 3);
+                e.Property(t => t.TukiKaal).HasPrecision(18, 3);
+                e.Property(t => t.Uhik).HasMaxLength(10).HasDefaultValue("tk");
+            });
 
             modelBuilder.Entity<Kasutaja>(e =>
             {
@@ -43,12 +51,33 @@ namespace Tooded_DB
                 e.Property(k => k.Boonus).HasPrecision(18, 2);
             });
 
+            modelBuilder.Entity<Pakkumine>(e =>
+            {
+                e.ToTable("Pakkumised");
+                e.Property(p => p.Tuup).HasMaxLength(60).IsRequired();
+                e.Property(p => p.KomplektHind).HasPrecision(18, 2);
+                e.HasOne(p => p.Toode).WithMany().HasForeignKey(p => p.ToodeId).OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(p => p.Toode2).WithMany().HasForeignKey(p => p.Toode2Id).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<MuugiRida>(e =>
+            {
+                e.ToTable("MuugiRead");
+                e.Property(r => r.Toode).HasMaxLength(100);
+                e.Property(r => r.Kogus).HasPrecision(18, 3);
+                e.Property(r => r.Summa).HasPrecision(18, 2);
+                e.HasOne(r => r.Muuk).WithMany(m => m.Read).HasForeignKey(r => r.MuukId).OnDelete(DeleteBehavior.Cascade);
+            });
+
             modelBuilder.Entity<Muuk>(e =>
             {
                 e.ToTable("Muugid");
                 e.Property(m => m.Kokku).HasPrecision(18, 2);
                 e.Property(m => m.KasutatudBoonus).HasPrecision(18, 2);
                 e.Property(m => m.Makstud).HasPrecision(18, 2);
+                e.Property(m => m.SynnipaevaSoodus).HasPrecision(18, 2);
+                e.Property(m => m.Maksetuup).HasMaxLength(50);
+                e.Property(m => m.SaadudBoonus).HasPrecision(18, 2);
                 e.Property(m => m.Arve).HasMaxLength(100);
                 // kui müüja või klient kustutatakse, jääb müük alles
                 e.HasOne(m => m.Kasutaja).WithMany().HasForeignKey(m => m.KasutajaId).OnDelete(DeleteBehavior.SetNull);

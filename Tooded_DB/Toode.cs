@@ -8,9 +8,12 @@ namespace Tooded_DB
     {
         public int Id { get; set; }
         public string Toodenimetus { get; set; }
-        public int Kogus { get; set; }
+        public decimal Kogus { get; set; }             // laoseis (kg-toodetel kilogrammides)
+        public string Uhik { get; set; } = "tk";       // müügiühik: "tk" (ka pakk, pudel) või "kg"
+        public decimal TukiKaal { get; set; }          // kg-toote ühe tüki keskmine kaal kg (0 = tükkidena ei müüda)
         public float Hind { get; set; }
         public string Pilt { get; set; }
+        public DateTime? SoodusAlates { get; set; }   // soodus kehtib alates sellest kuupäevast
         public int Soodus { get; set; }              // allahindlus protsentides (0 = soodust pole)
         public DateTime? SoodusKuni { get; set; }    // soodus kehtib selle kuupäevani (kaasa arvatud)
 

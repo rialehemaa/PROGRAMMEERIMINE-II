@@ -15,11 +15,13 @@ namespace Tooded_DB
     {
         private readonly ToodedContext _db;
         private string valitudPilt;
+        private ComboBox comboUhik;
 
         public Form2()
         {
             InitializeComponent();
             Teema.Rakenda(this);
+            Paigutus();
             _db = new ToodedContext();
             comboKategooria.DropDownStyle = ComboBoxStyle.DropDownList;   // ainult valik, teksti sisestada ei saa
             LaeKategooriad();
@@ -44,6 +46,63 @@ namespace Tooded_DB
             // piltu näidatakse kohe käivitamisel (esimese rea pilt)
             if (dataGridViewTooted.Rows.Count > 0)
                 NaitaPilti(dataGridViewTooted.Rows[0].Cells["Pilt"].Value?.ToString());
+
+            Keel.Rakenda(this);   // tõlgib ka hiljem lisatud väljad (vihjetekstid, ühiku valik)
+        }
+
+        // Suur tabel, mis venib aknaga kaasa; väljad paremal ja nupud all jäävad serva külge
+        private void Paigutus()
+        {
+            Text = "Ladu (haldus)";
+            ClientSize = new Size(1200, 680);
+            MinimumSize = new Size(940, 520);
+            int W = ClientSize.Width, H = ClientSize.Height;
+            int paremX = W - 12 - 230;
+
+            dataGridViewTooted.Location = new Point(12, 12);
+            dataGridViewTooted.Size = new Size(paremX - 24, H - 12 - 12 - 52);
+            dataGridViewTooted.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewTooted.ScrollBars = ScrollBars.Both;
+            dataGridViewTooted.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            comboUhik = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
+            comboUhik.Items.AddRange(new object[] { "tk", "kg" });
+            comboUhik.SelectedIndex = 0;
+            Controls.Add(comboUhik);
+            txtKogus.PlaceholderText = "Kogus (kg-toote puhul kilogrammides)";
+            txtHind.PlaceholderText = "Hind € (tk või kg kohta)";
+
+            var paremale = new Control[] { txtNimetus, txtKogus, txtHind, comboUhik, comboKategooria };
+            int y = 12;
+            foreach (var c in paremale)
+            {
+                c.Location = new Point(paremX, y);
+                c.Size = new Size(230, c.Height);
+                c.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                y += 40;
+            }
+            picturePilt.Location = new Point(paremX, y + 4);
+            picturePilt.Size = new Size(230, 190);
+            picturePilt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+
+            int nuppY = H - 12 - 38;
+            btnLisa.Size = new Size(110, 38);
+            btnUuenda.Size = new Size(110, 38);
+            btnKustuta.Size = new Size(110, 38);
+            btnKustuta.Location = new Point(W - 12 - 110, nuppY);
+            btnUuenda.Location = new Point(btnKustuta.Left - 8 - 110, nuppY);
+            btnLisa.Location = new Point(btnUuenda.Left - 8 - 110, nuppY);
+            foreach (var b in new[] { btnLisa, btnUuenda, btnKustuta })
+                b.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            button1.Size = new Size(140, 38);
+            button3.Size = new Size(160, 38);
+            btnValiPilt.Size = new Size(120, 38);
+            button1.Location = new Point(12, nuppY);
+            button3.Location = new Point(button1.Right + 8, nuppY);
+            btnValiPilt.Location = new Point(button3.Right + 8, nuppY);
+            foreach (var b in new[] { button1, button3, btnValiPilt })
+                b.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
         }
 
         // ---------- Abimeetodid ----------
@@ -120,6 +179,7 @@ namespace Tooded_DB
                     t.Id,
                     t.Toodenimetus,
                     t.Kogus,
+                    t.Uhik,
                     t.Hind,
                     Kategooria = t.Kategooria.Kategooria_nimetus,
                     t.Pilt
@@ -154,7 +214,7 @@ namespace Tooded_DB
                 return;
             }
 
-            string viga = Sisend.KontrolliKogus(txtKogus.Text, out int kogus);
+            string viga = Sisend.KontrolliKogus(txtKogus.Text, out decimal kogus);
             if (viga != null) { MessageBox.Show(viga); return; }
 
             viga = Sisend.KontrolliHind(txtHind.Text, out float hind);
@@ -170,6 +230,7 @@ namespace Tooded_DB
             {
                 Toodenimetus = txtNimetus.Text.Trim(),
                 Kogus = kogus,
+                Uhik = comboUhik.SelectedItem?.ToString() ?? "tk",
                 Hind = hind,
                 KategooriaId = (int)comboKategooria.SelectedValue,
                 Pilt = string.IsNullOrEmpty(valitudPilt) ? null : Path.GetFileName(valitudPilt)
@@ -192,6 +253,7 @@ namespace Tooded_DB
             txtNimetus.Text = rida.Cells["Toodenimetus"].Value?.ToString();
             txtKogus.Text = rida.Cells["Kogus"].Value?.ToString();
             txtHind.Text = rida.Cells["Hind"].Value?.ToString();
+            comboUhik.SelectedItem = rida.Cells["Uhik"].Value?.ToString() == "kg" ? "kg" : "tk";
 
             // vali toote kategooria ripploendis
             string kat = rida.Cells["Kategooria"].Value?.ToString();
@@ -210,7 +272,7 @@ namespace Tooded_DB
                 return;
             }
 
-            string viga = Sisend.KontrolliKogus(txtKogus.Text, out int kogus);
+            string viga = Sisend.KontrolliKogus(txtKogus.Text, out decimal kogus);
             if (viga != null) { MessageBox.Show(viga); return; }
 
             viga = Sisend.KontrolliHind(txtHind.Text, out float hind);
@@ -228,6 +290,7 @@ namespace Tooded_DB
 
             toode.Toodenimetus = txtNimetus.Text.Trim();
             toode.Kogus = kogus;
+            toode.Uhik = comboUhik.SelectedItem?.ToString() ?? "tk";
             toode.Hind = hind;
             toode.KategooriaId = (int)comboKategooria.SelectedValue;
 

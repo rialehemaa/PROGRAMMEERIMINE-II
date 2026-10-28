@@ -11,5 +11,6 @@ namespace Tooded_DB
         public string Kasutajanimi { get; set; }
         public string ParoolHash { get; set; }   // parool on salvestatud räsina, mitte tekstina
         public string Roll { get; set; }         // "Müüja" või "Omanik"
+        public int? KlientId { get; set; }       // kliendi login seotakse tema kliendikaardiga (ostuajalugu, boonus)
     }
 }

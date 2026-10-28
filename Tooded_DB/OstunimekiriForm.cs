@@ -16,7 +16,6 @@ namespace Tooded_DB
     public class OstunimekiriForm : Form
     {
         private DataGridView gridTooted, gridNimekiri;
-        private NumericUpDown numKogus;
         private Label lblKokku;
         private readonly BindingList<NimekiriRida> _nimekiri = new BindingList<NimekiriRida>();
         private readonly string _fail = Path.Combine(Kaustad.Juur, "Nimekiri_" + AktiivneKasutaja.Nimi + ".txt");
@@ -38,11 +37,9 @@ namespace Tooded_DB
             gridTooted = LooGrid();
             gridTooted.CellDoubleClick += (s, e) => { if (e.RowIndex >= 0) Lisa(); };
             var vasakAlt = new Panel { Dock = DockStyle.Bottom, Height = 50 };
-            var lKogus = new Label { Text = "Kogus:", Location = new Point(5, 15), AutoSize = true };
-            numKogus = new NumericUpDown { Location = new Point(65, 11), Width = 60, Minimum = 1, Maximum = 99, Value = 1 };
-            var btnLisa = new Button { Text = "Lisa nimekirja →", Location = new Point(140, 8), Size = new Size(180, 34) };
+            var btnLisa = new Button { Text = "Lisa nimekirja →", Location = new Point(5, 8), Size = new Size(180, 34) };
             btnLisa.Click += (s, e) => Lisa();
-            vasakAlt.Controls.AddRange(new Control[] { lKogus, numKogus, btnLisa });
+            vasakAlt.Controls.Add(btnLisa);
             var lVasak = new Label { Text = "Tooted", Dock = DockStyle.Top, Height = 30, Font = new Font("Segoe UI", 12, FontStyle.Bold) };
             vasak.Controls.Add(gridTooted);
             vasak.Controls.Add(vasakAlt);
@@ -119,9 +116,9 @@ namespace Tooded_DB
                 if (t == null) return;
                 var rida = _nimekiri.FirstOrDefault(r => r.ToodeId == id);
                 if (rida == null)
-                    _nimekiri.Add(new NimekiriRida { ToodeId = id, Toode = t.Toodenimetus, Kogus = (int)numKogus.Value, Hind = Allahindlus.HindPraegu(t) });
+                    _nimekiri.Add(new NimekiriRida { ToodeId = id, Toode = t.Toodenimetus, Kogus = 1, Hind = Allahindlus.HindPraegu(t) });
                 else
-                    rida.Kogus += (int)numKogus.Value;
+                    rida.Kogus += 1;
                 Salvesta();
                 Uuenda();
             }
@@ -146,7 +143,7 @@ namespace Tooded_DB
         private void Uuenda()
         {
             _nimekiri.ResetBindings();
-            lblKokku.Text = "Kokku: " + _nimekiri.Sum(r => r.Summa).ToString("0.00") + " €";
+            lblKokku.Text = Keel.T("Kokku: ") + _nimekiri.Sum(r => r.Summa).ToString("0.00") + " €";
         }
 
         // fail: iga rida "toodeId;kogus"

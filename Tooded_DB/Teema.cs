@@ -27,6 +27,7 @@ namespace Tooded_DB
             vorm.Font = new Font("Segoe UI", 10f);
             if (vorm.FormBorderStyle == FormBorderStyle.Sizable) Venita(vorm);
             Stiilita(vorm);
+            Keel.Rakenda(vorm);
         }
 
         // Muudetava suurusega aken: vormi otse all olevad kontrollid (mis pole Dock-iga) saavad Anchor-i,
@@ -40,7 +41,8 @@ namespace Tooded_DB
             {
                 if (c.Dock != DockStyle.None) continue;
                 AnchorStyles a = AnchorStyles.Top | AnchorStyles.Left;
-                if (c is DataGridView)
+                if (c is Label) a = AnchorStyles.Top | AnchorStyles.Left;
+                else if (c is DataGridView)
                     a = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
                 else
                 {
@@ -104,7 +106,7 @@ namespace Tooded_DB
             b.FlatAppearance.MouseDownBackColor = hover;
             b.BackColor = varv;
             b.ForeColor = Tekst;
-            b.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+            b.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
             b.Cursor = Cursors.Hand;
             b.UseVisualStyleBackColor = false;
 

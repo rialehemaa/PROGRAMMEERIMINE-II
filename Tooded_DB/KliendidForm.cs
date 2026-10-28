@@ -11,6 +11,7 @@ namespace Tooded_DB
         private DataGridView grid;
         private TextBox txtOtsi, txtNimi, txtEmail, txtTelefon, txtKaart, txtBoonus;
         private DateTimePicker dtSynnipaev;
+        private Button btnUuenda, btnKustuta;
         private int? _valitudId;
 
         public KliendidForm()
@@ -23,11 +24,20 @@ namespace Tooded_DB
             Teema.Rakenda(this);
             Load += (s, e) =>
             {
-                if (!AktiivneKasutaja.OnOmanik)
+                if (AktiivneKasutaja.OnKlient)
                 {
-                    MessageBox.Show("Sellel vormil on juurdepääs ainult omanikul.");
+                    MessageBox.Show("Sellel vormil pole sul juurdepääsu.");
                     Close();
                     return;
+                }
+                if (!AktiivneKasutaja.OnOmanik)
+                {
+                    // müüja: saab ainult uusi kliente lisada, boonust ei saa muuta ega kliente kustutada
+                    txtBoonus.Enabled = false;
+                    txtBoonus.Text = "0";
+                    btnUuenda.Visible = false;
+                    btnKustuta.Visible = false;
+                    Text = "Kliendid – uue kliendi lisamine";
                 }
                 LaeKliendid();
             };
@@ -62,8 +72,8 @@ namespace Tooded_DB
             var l1 = L("Nimi"); txtNimi = T();
             var l2 = L("E-post"); txtEmail = T();
             var l3 = L("Telefon"); txtTelefon = T();
-            var l4 = L("Kliendikaart (tühi = loo automaatselt)"); txtKaart = T();
-            var l6 = L("Sünnipäev (tühi = pole teada)");
+            var l4 = L("Kliendikaart (tühi = automaatne)"); txtKaart = T();
+            var l6 = L("Sünnipäev (tühi = teadmata)");
             dtSynnipaev = new DateTimePicker { Location = new Point(x, y), Width = 300, Format = DateTimePickerFormat.Short, ShowCheckBox = true, MaxDate = DateTime.Today, Checked = false };
             y += 38;
             var l5 = L("Boonus (€)"); txtBoonus = T();
@@ -71,9 +81,9 @@ namespace Tooded_DB
 
             var btnLisa = new Button { Text = "Lisa", Location = new Point(x, y), Size = new Size(95, 32) };
             btnLisa.Click += btnLisa_Click;
-            var btnUuenda = new Button { Text = "Uuenda", Location = new Point(x + 102, y), Size = new Size(95, 32) };
+            btnUuenda = new Button { Text = "Uuenda", Location = new Point(x + 102, y), Size = new Size(95, 32) };
             btnUuenda.Click += btnUuenda_Click;
-            var btnKustuta = new Button { Text = "Kustuta", Location = new Point(x + 204, y), Size = new Size(95, 32) };
+            btnKustuta = new Button { Text = "Kustuta", Location = new Point(x + 204, y), Size = new Size(95, 32) };
             btnKustuta.Click += btnKustuta_Click;
             var btnTuhjenda = new Button { Text = "Tühjenda väljad", Location = new Point(x, y + 40), Size = new Size(299, 30) };
             btnTuhjenda.Click += (s, e) => TuhjendaValjad();
@@ -118,7 +128,7 @@ namespace Tooded_DB
             var sp = r.Cells["Synnipaev"].Value as DateTime?;
             dtSynnipaev.Checked = sp != null;
             if (sp != null) dtSynnipaev.Value = sp.Value;
-            txtBoonus.Text = Convert.ToDecimal(r.Cells["Boonus"].Value).ToString("0.00");
+            if (AktiivneKasutaja.OnOmanik) txtBoonus.Text = Convert.ToDecimal(r.Cells["Boonus"].Value).ToString("0.00");
         }
 
         private void TuhjendaValjad()
@@ -184,7 +194,7 @@ namespace Tooded_DB
                     Telefon = txtTelefon.Text.Trim(),
                     Kliendikaart = kaart,
                     Synnipaev = dtSynnipaev.Checked ? dtSynnipaev.Value.Date : (DateTime?)null,
-                    Boonus = boonus
+                    Boonus = AktiivneKasutaja.OnOmanik ? boonus : 0
                 });
                 db.SaveChanges();
                 TuhjendaValjad();
@@ -198,6 +208,7 @@ namespace Tooded_DB
 
         private void btnUuenda_Click(object sender, EventArgs e)
         {
+            if (!AktiivneKasutaja.OnOmanik) return;
             if (_valitudId == null) { MessageBox.Show("Vali tabelist klient."); return; }
             if (!KontrolliValjad(out decimal boonus)) return;
 
@@ -232,6 +243,7 @@ namespace Tooded_DB
 
         private void btnKustuta_Click(object sender, EventArgs e)
         {
+            if (!AktiivneKasutaja.OnOmanik) return;
             if (_valitudId == null) { MessageBox.Show("Vali tabelist klient."); return; }
             if (MessageBox.Show("Kas kustutada valitud klient?", "Kinnitus", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
 

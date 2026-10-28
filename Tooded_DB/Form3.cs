@@ -61,7 +61,7 @@ namespace Tooded_DB
 
                 foreach (var kat in kategooriad)
                 {
-                    var page = new TabPage(kat.Kategooria_nimetus);
+                    var page = new TabPage(Keel.T(kat.Kategooria_nimetus));
                     var flow = new FlowLayoutPanel
                     {
                         Dock = DockStyle.Fill,
@@ -102,7 +102,7 @@ namespace Tooded_DB
 
             var nimi = new Label
             {
-                Text = t.Toodenimetus,
+                Text = Keel.T(t.Toodenimetus),
                 Location = new Point(4, 150),
                 Size = new Size(150, 22),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -112,7 +112,7 @@ namespace Tooded_DB
 
             var hind = new Label
             {
-                Text = Math.Round((decimal)t.Hind, 2).ToString("0.00") + " €",
+                Text = Keel.T(Math.Round((decimal)t.Hind, 2).ToString("0.00") + " €" + (t.Uhik == "kg" ? " / kg" : "")),
                 Location = new Point(4, 172),
                 Size = new Size(150, 20),
                 TextAlign = ContentAlignment.MiddleCenter
@@ -122,7 +122,7 @@ namespace Tooded_DB
 
             // klõps kaardile näitab toote infot
             EventHandler info = (s, e) =>
-                MessageBox.Show($"Toode: {t.Toodenimetus}\nHind: {Math.Round((decimal)t.Hind, 2):0.00} €\nLaos: {t.Kogus} tk",
+                MessageBox.Show($"{Keel.T("Toode:")} {Keel.T(t.Toodenimetus)}\n{Keel.T("Hind:")} " + Keel.T(Math.Round((decimal)t.Hind, 2).ToString("0.00") + " €" + (t.Uhik == "kg" ? " / kg" : "")),
                     "Toote info");
             p.Click += info;
             foreach (Control c in p.Controls) c.Click += info;
