@@ -24,7 +24,7 @@ Paroolid on andmebaasis BCrypt-räsina. Uue kasutaja saab registreerida sisselog
 
 | Roll | Saab teha |
 |---|---|
-| Omanik | kõik: ladu, kliendid ja boonused, pakkumised, müügiajalugu, tagastused |
+| Omanik | kõik: ladu, kliendid ja boonused, pakkumised, müügiajalugu, tagastused, statistika |
 | Müüja | kassa, uue kliendi lisamine, müügiajalugu; boonust ei muuda ja kliente ei kustuta |
 | Klient | pood, veebitellimus, oma ostud ja tšekid, ostunimekiri |
 
@@ -37,7 +37,9 @@ Paroolid on andmebaasis BCrypt-räsina. Uue kasutaja saab registreerida sisselog
 - **Maksmine**: sularahas (arvutab tagasi antava summa), kaardiga, arvega (IBAN ja viitenumber).
 - **Tšekk**: PDF kaustas `Arved`, saab saata e-postiga.
 - **Müügiajalugu ja tagastus**: tagastamisel läheb kaup lattu tagasi ja boonus võetakse tagasi.
+- **Statistika** (omanik): käive päevade kaupa ja enimmüüdud tooted, diagrammid ja tabelid; periood 7, 30, 90 päeva või kogu aeg. Tagastatud oste ei arvestata.
 - **Veebipood**: klient tellib ja maksab ise, tšekk jääb tema ostude alla.
+- **Teema**: hele ja tume, vahetus peamenüüs, valik jääb meelde (`%LOCALAPPDATA%\ToodedApp\teema.txt`).
 - **Keeled**: ET / RU / EN, valik jääb meelde (`%LOCALAPPDATA%\ToodedApp\keel.txt`). Tõlgitakse ka tooted, kategooriad, tšekid ja teated.
 
 ## Struktuur
@@ -53,9 +55,10 @@ Paroolid on andmebaasis BCrypt-räsina. Uue kasutaja saab registreerida sisselog
 | `Form3.cs` | kliendi pood |
 | `KassaForm.cs` | kassa ja veebipood, `Maksa()` teeb ostu ühes transaktsioonis |
 | `Allahindlus.cs` | soodusloogika |
+| `StatistikaForm.cs` | statistika vorm ja tulpdiagramm |
 | `KliendidForm.cs`, `MuugidForm.cs`, `OstudForm.cs`, `PakkumisedForm.cs`, `OstunimekiriForm.cs` | muud vormid |
 | `Keel.cs` | tõlked ja keelevahetus |
-| `Teema.cs` | värvid ja paigutus |
+| `Teema.cs` | värvid (hele ja tume teema) ja paigutus |
 | `Epost.cs` | tšeki saatmine |
 
 ## Paketid
