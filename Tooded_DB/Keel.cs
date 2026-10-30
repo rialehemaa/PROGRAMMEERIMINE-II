@@ -200,7 +200,28 @@ namespace Tooded_DB
             ["Kasutajanimi peab olema vähemalt 3 märki!"] = ("Имя пользователя — минимум 3 символа!", "Username must be at least 3 characters!"),
             ["Parool peab olema vähemalt 4 märki!"] = ("Пароль — минимум 4 символа!", "Password must be at least 4 characters!"),
             ["Paroolid ei ole ühesugused!"] = ("Пароли не совпадают!", "Passwords do not match!"),
-            ["Selline kasutajanimi on juba olemas!"] = ("Такое имя пользователя уже существует!", "That username already exists!")
+            ["Selline kasutajanimi on juba olemas!"] = ("Такое имя пользователя уже существует!", "That username already exists!"),
+            ["Statistika"] = ("Статистика", "Statistics"),
+            ["Periood:"] = ("Период:", "Period:"),
+            ["Viimased 7 päeva"] = ("Последние 7 дней", "Last 7 days"),
+            ["Viimased 30 päeva"] = ("Последние 30 дней", "Last 30 days"),
+            ["Viimased 90 päeva"] = ("Последние 90 дней", "Last 90 days"),
+            ["Kogu aeg"] = ("Всё время", "All time"),
+            ["Müük päevade kaupa"] = ("Продажи по дням", "Sales by day"),
+            ["Enimmüüdud tooted"] = ("Самые продаваемые товары", "Best-selling products"),
+            ["Käive päevade kaupa (€)"] = ("Оборот по дням (€)", "Revenue by day (€)"),
+            ["Enimmüüdud tooted (tulu €)"] = ("Самые продаваемые товары (выручка €)", "Best-selling products (revenue €)"),
+            ["Andmeid pole."] = ("Данных нет.", "No data."),
+            ["Müüke kokku:"] = ("Всего продаж:", "Total sales:"),
+            ["Käive:"] = ("Оборот:", "Revenue:"),
+            ["Keskmine ost:"] = ("Средний чек:", "Average sale:"),
+            ["Tagastatud oste ei arvestata."] = ("Возвраты не учитываются.", "Returns are not counted."),
+            ["Kuupäev"] = ("Дата", "Date"),
+            ["Müüke"] = ("Продаж", "Sales"),
+            ["Käive (€)"] = ("Оборот (€)", "Revenue (€)"),
+            ["Tulu (€)"] = ("Выручка (€)", "Revenue (€)"),
+            ["Tume teema"] = ("Тёмная тема", "Dark theme"),
+            ["Hele teema"] = ("Светлая тема", "Light theme")
         };
 
         static Keel()

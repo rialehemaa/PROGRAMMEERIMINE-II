@@ -150,7 +150,7 @@ namespace Tooded_DB
             txtKaart.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; OtsiKlient(); } };
             var btnOtsiKlient = Nupp("Otsi", 232, 384, 70, (s, e) => OtsiKlient());
             var btnEemaldaKlient = Nupp("Eemalda", 308, 384, 90, (s, e) => SeaKlient(null));
-            lblKlient = new Label { Location = new Point(10, 422), Size = new Size(430, 22), ForeColor = Color.DimGray, Text = "Klienti pole valitud" };
+            lblKlient = new Label { Location = new Point(10, 422), Size = new Size(430, 22), ForeColor = Teema.Vaigne, Text = "Klienti pole valitud" };
             chkBoonus = new CheckBox { Text = "Kasuta boonust", Location = new Point(10, 448), AutoSize = true, Enabled = false };
             chkBoonus.CheckedChanged += (s, e) => UuendaSumma();
 
@@ -184,7 +184,7 @@ namespace Tooded_DB
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
-                BackColor = Color.WhiteSmoke,
+                BackColor = Teema.Taust,
                 Padding = new Padding(8)
             };
 
@@ -264,7 +264,7 @@ namespace Tooded_DB
                 Size = new Size(160, 215),
                 Margin = new Padding(6),
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = otsas ? Color.Gainsboro : Color.White,
+                BackColor = otsas ? Teema.Hall : Teema.Kaart,
                 Cursor = otsas ? Cursors.No : Cursors.Hand
             };
 
@@ -295,7 +295,7 @@ namespace Tooded_DB
                 Location = new Point(4, 156),
                 Size = new Size(150, 20),
                 TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = soodus ? Color.Firebrick : SystemColors.ControlText,
+                ForeColor = soodus ? Teema.Hoiatus : Teema.Tekst,
                 Font = new Font(Font.FontFamily, soodus ? 8.5f : 9f, soodus ? FontStyle.Bold : FontStyle.Regular)
             };
 
@@ -306,7 +306,7 @@ namespace Tooded_DB
                 Location = new Point(4, 178),
                 Size = new Size(150, 20),
                 TextAlign = ContentAlignment.MiddleCenter,
-                ForeColor = vahe ? Color.Firebrick : Color.DimGray,
+                ForeColor = vahe ? Teema.Hoiatus : Teema.Vaigne,
                 Font = new Font(Font.FontFamily, 9, vahe ? FontStyle.Bold : FontStyle.Regular)
             };
 
@@ -598,13 +598,13 @@ namespace Tooded_DB
                 if (Loe(out decimal a) && a >= maksta)
                 {
                     lTagasi.Text = "Tagasi anda: " + (a - maksta).ToString("0.00") + " €";
-                    lTagasi.ForeColor = Color.SeaGreen;
+                    lTagasi.ForeColor = Teema.Korras;
                     ok.Enabled = true;
                 }
                 else
                 {
                     lTagasi.Text = "Antud summa on liiga väike";
-                    lTagasi.ForeColor = Color.Firebrick;
+                    lTagasi.ForeColor = Teema.Hoiatus;
                     ok.Enabled = false;
                 }
             }

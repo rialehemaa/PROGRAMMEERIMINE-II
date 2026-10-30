@@ -20,9 +20,16 @@
             };
             var ylaPaneel = new Panel { Dock = DockStyle.Top, Height = 44 };
             var keeleValik = Keel.Valik(this);
-            keeleValik.Dock = DockStyle.Right;
+            keeleValik.Dock = DockStyle.Top;
+            var keelePaneel = new Panel { Dock = DockStyle.Right, Width = 100, Padding = new Padding(4, 9, 4, 0) };
+            keelePaneel.Controls.Add(keeleValik);
             ylaPaneel.Controls.Add(tere);
-            ylaPaneel.Controls.Add(keeleValik);
+            ylaPaneel.Controls.Add(keelePaneel);
+            var btnTeema = new Button { Text = Teema.Tume ? "Hele teema" : "Tume teema", Dock = DockStyle.Fill };
+            btnTeema.Click += (s, e) => { Teema.Sea(!Teema.Tume); DialogResult = DialogResult.Yes; };
+            var teemaPaneel = new Panel { Dock = DockStyle.Right, Width = 112, Padding = new Padding(4, 9, 4, 9) };   // väiksem nupp
+            teemaPaneel.Controls.Add(btnTeema);
+            ylaPaneel.Controls.Add(teemaPaneel);
 
             // Iga roll näeb ainult neid nuppe, millega ta saab töötada (ülejäänud on peidetud)
             var nupud = new List<(string tekst, Action ava)>();
@@ -32,6 +39,7 @@
             if (omanik) nupud.Add(("Kliendid (admin)", () => { using var f = new KliendidForm(); f.ShowDialog(this); }));
             if (muuja) nupud.Add(("Kliendid (admin)", () => { using var f = new KliendidForm(); f.ShowDialog(this); }));
             if (omanik || muuja) nupud.Add(("Müügiajalugu", () => { using var f = new MuugidForm(); f.ShowDialog(this); }));
+            if (omanik) nupud.Add(("Statistika", () => { using var f = new StatistikaForm(); f.ShowDialog(this); }));
             if (omanik || klient) nupud.Add(("Veebipood", () => { using var f = new KassaForm(true); f.ShowDialog(this); }));
             if (omanik || muuja) nupud.Add(("Pakkumised (haldus)", () => { using var f = new PakkumisedForm(true); f.ShowDialog(this); }));
             if (omanik || klient) nupud.Add(("Nädala pakkumised", () => { using var f = new PakkumisedForm(false); f.ShowDialog(this); }));
@@ -64,7 +72,7 @@
             Controls.Add(tabel);
             Controls.Add(ylaPaneel);
 
-            ClientSize = new Size(360, 64 + (nupud.Count + 1) * 56);
+            ClientSize = new Size(440, 64 + (nupud.Count + 1) * 56);
             MinimumSize = new Size(300, 64 + (nupud.Count + 1) * 44);
             Teema.Rakenda(this);
         }

@@ -37,7 +37,7 @@ namespace Tooded_DB
             {
                 Location = new Point(20, 170),
                 Size = new Size(300, 40),
-                ForeColor = Color.Firebrick
+                ForeColor = Teema.Hoiatus
             };
 
             btnLogin = new Button { Text = "Logi sisse", Location = new Point(20, 215), Size = new Size(140, 34) };
@@ -58,7 +58,7 @@ namespace Tooded_DB
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            lblViga.ForeColor = Color.Firebrick;
+            lblViga.ForeColor = Teema.Hoiatus;
             lblViga.Text = "";
             string nimi = txtNimi.Text.Trim();
             string parool = txtParool.Text;
@@ -104,7 +104,7 @@ namespace Tooded_DB
                 txtNimi.Text = f.Kasutajanimi;
                 txtParool.Clear();
                 txtParool.Focus();
-                lblViga.ForeColor = Color.SeaGreen;
+                lblViga.ForeColor = Teema.Korras;
                 lblViga.Text = Keel.T("Kasutaja loodud. Logi sisse.");
             }
         }

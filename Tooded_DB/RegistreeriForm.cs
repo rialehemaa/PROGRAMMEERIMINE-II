@@ -41,7 +41,7 @@ namespace Tooded_DB
             comboRoll.Items.AddRange(new object[] { Rollid.Muuja, Rollid.Omanik, Rollid.Klient });
             comboRoll.SelectedIndex = 0;
 
-            lblViga = new Label { Location = new Point(20, 275), Size = new Size(300, 40), ForeColor = Color.Firebrick };
+            lblViga = new Label { Location = new Point(20, 275), Size = new Size(300, 40), ForeColor = Teema.Hoiatus };
 
             var btnOk = new Button { Text = "Registreeri", Location = new Point(20, 325), Size = new Size(140, 34) };
             btnOk.Click += btnOk_Click;

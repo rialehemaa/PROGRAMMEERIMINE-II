@@ -34,10 +34,17 @@ namespace Tooded_DB
                     if (login.ShowDialog() != DialogResult.OK) return;
                 }
 
-                using (var menu = new FormMain())
+                bool jatka;
+                do
                 {
-                    if (menu.ShowDialog() != DialogResult.Retry) return;
-                }
+                    jatka = false;
+                    using (var menu = new FormMain())
+                    {
+                        var tulemus = menu.ShowDialog();
+                        if (tulemus == DialogResult.Yes) jatka = true;   // teema vahetati: ava menu uuesti
+                        else if (tulemus != DialogResult.Retry) return;
+                    }
+                } while (jatka);
                 AktiivneKasutaja.Tuhjenda();
             }
         }

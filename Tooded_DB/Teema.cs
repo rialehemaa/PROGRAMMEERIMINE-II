@@ -1,24 +1,86 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Tooded_DB
 {
     // Ühtne kujundus kogu rakendusele: värvid, font, nupud, tabelid, vahekaardid.
     // Kasutus: Teema.Rakenda(this); vormi konstruktori lõpus.
+    // Kaks teemat: hele ja tume. Valik salvestatakse faili teema.txt.
     public static class Teema
     {
-        public static readonly Color Taust = Color.FromArgb(250, 247, 252);
-        public static readonly Color Kaart = Color.White;
-        public static readonly Color Pohi = Color.FromArgb(188, 204, 244);          // pastelne sinine
-        public static readonly Color PohiHover = Color.FromArgb(165, 184, 236);
-        public static readonly Color Hall = Color.FromArgb(220, 226, 238);          // pastelne hall
-        public static readonly Color HallHover = Color.FromArgb(200, 208, 224);
-        public static readonly Color Punane = Color.FromArgb(247, 187, 200);        // pastelne roosa
-        public static readonly Color PunaneHover = Color.FromArgb(240, 160, 178);
-        public static readonly Color Tekst = Color.FromArgb(55, 60, 90);
-        public static readonly Color Pealkiri = Color.FromArgb(110, 115, 185);
-        public static readonly Color Joon = Color.FromArgb(232, 232, 244);
+        public static bool Tume { get; private set; }
+
+        public static Color Taust, Kaart, Pohi, PohiHover, Hall, HallHover, Punane, PunaneHover;
+        public static Color Tekst, Pealkiri, Joon, Valitud, Vahe, Keelatud, KeelatudTekst, Vaigne, Hoiatus, Korras;
+
+        private static readonly string Fail = Path.Combine(Kaustad.Juur, "teema.txt");
+
+        static Teema()
+        {
+            bool tume = false;
+            try
+            {
+                if (File.Exists(Fail)) tume = File.ReadAllText(Fail).Trim() == "tume";
+            }
+            catch { }
+            Palett(tume);
+        }
+
+        // vahetab teema ja jätab valiku meelde; uued vormid saavad uued värvid
+        public static void Sea(bool tume)
+        {
+            Palett(tume);
+            try { Directory.CreateDirectory(Kaustad.Juur); File.WriteAllText(Fail, tume ? "tume" : "hele"); } catch { }
+        }
+
+        private static void Palett(bool tume)
+        {
+            Tume = tume;
+            if (!tume)
+            {
+                Taust = Color.FromArgb(250, 247, 252);
+                Kaart = Color.White;
+                Pohi = Color.FromArgb(188, 204, 244);          // pastelne sinine
+                PohiHover = Color.FromArgb(165, 184, 236);
+                Hall = Color.FromArgb(220, 226, 238);          // pastelne hall
+                HallHover = Color.FromArgb(200, 208, 224);
+                Punane = Color.FromArgb(247, 187, 200);        // pastelne roosa
+                PunaneHover = Color.FromArgb(240, 160, 178);
+                Tekst = Color.FromArgb(55, 60, 90);
+                Pealkiri = Color.FromArgb(110, 115, 185);
+                Joon = Color.FromArgb(232, 232, 244);
+                Valitud = Color.FromArgb(228, 234, 252);
+                Vahe = Color.FromArgb(252, 250, 254);
+                Keelatud = Color.FromArgb(236, 236, 244);
+                KeelatudTekst = Color.FromArgb(160, 165, 185);
+                Vaigne = Color.DimGray;
+                Hoiatus = Color.Firebrick;
+                Korras = Color.SeaGreen;
+            }
+            else
+            {
+                Taust = Color.FromArgb(28, 30, 42);
+                Kaart = Color.FromArgb(40, 43, 60);
+                Pohi = Color.FromArgb(82, 98, 168);
+                PohiHover = Color.FromArgb(100, 117, 190);
+                Hall = Color.FromArgb(62, 66, 90);
+                HallHover = Color.FromArgb(78, 83, 110);
+                Punane = Color.FromArgb(150, 68, 92);
+                PunaneHover = Color.FromArgb(172, 84, 110);
+                Tekst = Color.FromArgb(232, 234, 246);
+                Pealkiri = Color.FromArgb(168, 176, 240);
+                Joon = Color.FromArgb(58, 62, 84);
+                Valitud = Color.FromArgb(58, 68, 118);
+                Vahe = Color.FromArgb(35, 38, 53);
+                Keelatud = Color.FromArgb(48, 51, 70);
+                KeelatudTekst = Color.FromArgb(110, 115, 140);
+                Vaigne = Color.FromArgb(170, 176, 200);
+                Hoiatus = Color.FromArgb(255, 130, 130);
+                Korras = Color.FromArgb(110, 200, 140);
+            }
+        }
 
         public static void Rakenda(Form vorm)
         {
@@ -65,6 +127,21 @@ namespace Tooded_DB
                         break;
                     case TextBox t:
                         t.BorderStyle = BorderStyle.FixedSingle;
+                        t.BackColor = Kaart;
+                        t.ForeColor = Tekst;
+                        break;
+                    case ComboBox cb:
+                        cb.FlatStyle = FlatStyle.Flat;
+                        cb.BackColor = Kaart;
+                        cb.ForeColor = Tekst;
+                        break;
+                    case NumericUpDown n:
+                        n.BackColor = Kaart;
+                        n.ForeColor = Tekst;
+                        break;
+                    case ListBox lb:
+                        lb.BackColor = Kaart;
+                        lb.ForeColor = Tekst;
                         break;
                     case DataGridView g:
                         StiilitaTabel(g);
@@ -112,14 +189,14 @@ namespace Tooded_DB
 
             b.EnabledChanged += (s, e) =>
             {
-                b.BackColor = b.Enabled ? varv : Color.FromArgb(236, 236, 244);
-                b.ForeColor = b.Enabled ? Tekst : Color.FromArgb(160, 165, 185);
+                b.BackColor = b.Enabled ? varv : Keelatud;
+                b.ForeColor = b.Enabled ? Tekst : KeelatudTekst;
                 b.Cursor = b.Enabled ? Cursors.Hand : Cursors.Default;
             };
             if (!b.Enabled)
             {
-                b.BackColor = Color.FromArgb(236, 236, 244);
-                b.ForeColor = Color.FromArgb(160, 165, 185);
+                b.BackColor = Keelatud;
+                b.ForeColor = KeelatudTekst;
             }
         }
 
@@ -140,9 +217,9 @@ namespace Tooded_DB
             g.ColumnHeadersDefaultCellStyle.SelectionBackColor = Pohi;
             g.DefaultCellStyle.BackColor = Kaart;
             g.DefaultCellStyle.ForeColor = Tekst;
-            g.DefaultCellStyle.SelectionBackColor = Color.FromArgb(228, 234, 252);
+            g.DefaultCellStyle.SelectionBackColor = Valitud;
             g.DefaultCellStyle.SelectionForeColor = Tekst;
-            g.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(252, 250, 254);
+            g.AlternatingRowsDefaultCellStyle.BackColor = Vahe;
             g.RowTemplate.Height = 30;
         }
     }
