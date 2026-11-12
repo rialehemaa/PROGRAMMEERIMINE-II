@@ -1,55 +1,70 @@
-Kolm rakendust (Windows Forms)
-Projekti eesmärk ja kirjeldus
+# Tooded_DB
 
-Pildivaataja — kuvab pilti, võimaldab muuta tausta värvi, venitust ning esitada pilte slaidiesitusena (kui lisatud on 2 või rohkem fotot).
-Matemaatiline mäng — genereerib ülesandeid valitud klassi ja aja järgi ning kontrollib kasutaja vastuseid.
-Sarnaste piltide leidmise mäng — mälumäng, kus tuleb leida sümbolite paarid valitud suurusega mängulaual.
-Kasutatud tehnoloogiad:
-C#
-Windows Forms (.NET Framework 4.7.2)
-OOP (klassid, kapseldamine — vormid ei sisalda äriloogikat otse, vaid kasutavad selleks eraldi klasse)
-1. Pildivaataja
+Poe haldusrakendus: Windows Forms (.NET 10), Entity Framework Core 10 ja SQL Server LocalDB. Kõik vormid on tehtud koodis, ilma Designerita (välja arvatud Form2.Designer.cs). Liides on kolmes keeles: eesti, vene ja inglise.
 
-Arendusideed:
-Lisa nupu abil pildi salvestamine teise formaati (Image.Save). — ei ole veel tehtud
-Lisa pildigalerii pisipiltidega, et valitud pilte kiiremini sirvida. — ei ole veel tehtud
-Lisa slaidiesituse kiiruse valik (nt 1 / 2 / 5 sekundit). — ei ole veel tehtud
+## Käivitamine
 
-Tehtud algülesandest:
-Taustavärvi muutmine (ColorDialog) — olemas, BtnTaust_Click
-Slaidiesitus automaatse vahetusega — olemas, märkeruut chkSlaid + slaidTimer (2 sek)
+1. Ava lahendus Visual Studios, vajuta F5.
+2. Esimesel käivitamisel loob `Program.Main` andmebaasi (`Migrate()`) ja lisab näidisandmed.
+3. Kui muudad mudelit: `Add-Migration Nimi`, siis `Update-Database`.
 
-Lisatud omalt poolt:
-Mitme pildi korraga laadimine (Multiselect), pildi pööramine 90° (BtnPoorra_Click), pildi peegeldamine (BtnPeegelda_Click).
+Vajalik: .NET 10 SDK, SQL Server LocalDB.
 
-2. Matemaatiline mäng
+## Kasutajad
 
-Arendusideed:
-Lisa punktiarvestus, mis arvestab ka vastamise kiirust. — ei ole veel tehtud
-Lisa tulemuste salvestamine faili, et näha oma parimaid katseid. — ei ole veel tehtud
-Lisa rohkem ülesandeid korraga (nt 8 tehet 4 asemel) raskema taseme puhul. — ei ole veel tehtud
+| Roll | Kasutajanimi | Parool |
+|---|---|---|
+| Omanik | omanik | omanik123 |
+| Müüja | muuja | muuja123 |
+| Klient | klient | klient123 |
 
-Tehtud algülesandest:
-Erinevad tehted (−, ×, ÷) — olemas, MathProblem töötleb +, -, *, /
-Ajapiirang — olemas (timer, sekundeid); punktisüsteem — ei ole tehtud, on ainult loendur "mitu õiget 4-st" mängu lõpus, mitte kogunevad punktid
-Raskusastme valik — olemas (1.-4. / 5.-9. / 10.-12. klass)
+Paroolid on andmebaasis BCrypt-räsina. Uue kasutaja saab registreerida sisselogimisaknas, ta saab rolli Klient.
 
-Lisatud omalt poolt:
-Aja kestuse valik (30/45/60 sekundit), nupp "Kontrolli vastuseid" mängu enneaegseks lõpetamiseks, õige/vale märgistus iga vastuse juures.
+## Õigused
 
-3. Sarnaste piltide leidmise mäng
+| Roll | Saab teha |
+|---|---|
+| Omanik | kõik: ladu, kliendid ja boonused, pakkumised, müügiajalugu, tagastused, statistika |
+| Müüja | kassa, uue kliendi lisamine, müügiajalugu; boonust ei muuda ja kliente ei kustuta |
+| Klient | pood, veebitellimus, oma ostud ja tšekid, ostunimekiri |
 
-Arendusideed:
-Lisa tegelikud pildid sümbolite asemel (nt PictureBox koos peidetud pildiga). — ei ole veel tehtud
-Lisa punktisüsteem (vähem käike/aega = rohkem punkte). — ei ole veel tehtud
-Lisa helid paari sobimisel/mittesobimisel (SoundPlayer). — ei ole veel tehtud
+## Mida rakendus oskab
 
-Tehtud algülesandest:
-Taimer — olemas (varjaTimer kaartide peitmiseks + aegTimer sekundikellake); punktisüsteem — ei ole tehtud, ainult aeg sekundites
-Tasemed (4x4, 6x6) — olemas, grpSuurus koos rb4/rb6
+- **Ladu**: toodete ja kategooriate lisamine, muutmine, kustutamine, pildid, ühik (tk või kg).
+- **Kassa**: ostukorv, kaalutooted (kogus kilogrammides), kliendi otsing kaardi või nime järgi.
+- **Soodused**: protsentsoodus tootel, pakkumised (N+M tasuta, komplekt hinnaga X, soodus teisele tootele), sünnipäevasoodus (−15 % ostukorvile ja −5 % kondiitritoodetele, ±3 päeva −10 %).
+- **Boonus**: 5 % makstud summast, saab järgmisel ostul kasutada.
+- **Maksmine**: sularahas (arvutab tagasi antava summa), kaardiga, arvega (IBAN ja viitenumber).
+- **Tšekk**: PDF kaustas `Arved`, saab saata e-postiga.
+- **Müügiajalugu ja tagastus**: tagastamisel läheb kaup lattu tagasi ja boonus võetakse tagasi.
+- **Statistika** (omanik): käive päevade kaupa ja enimmüüdud tooted, diagrammid ja tabelid; periood 7, 30, 90 päeva või kogu aeg. Tagastatud oste ei arvestata.
+- **Veebipood**: klient tellib ja maksab ise, tšekk jääb tema ostude alla.
+- **Teema**: hele ja tume, vahetus peamenüüs, valik jääb meelde (`%LOCALAPPDATA%\ToodedApp\teema.txt`).
+- **Keeled**: ET / RU / EN, valik jääb meelde (`%LOCALAPPDATA%\ToodedApp\keel.txt`). Tõlgitakse ka tooted, kategooriad, tšekid ja teated.
 
-Lisatud omalt poolt:
-Nähtav sekundikellake kogu mängu kestuse mõõtmiseks, tagasipöördumine suuruse valiku ekraanile pärast võitu.
+## Struktuur
 
-Eeldav edasiareng:
-Kõik kolm rakendust saab siduda ühise punktiarvestuse/kasutajaprofiiliga, lisada helid (SoundPlayer) sündmustele (õige vastus, paari leidmine) ning salvestada tulemused failisse, et näha ajaloolist statistikat.
+| Fail | Sisu |
+|---|---|
+| `Program.cs` | käivitus, migratsioonid, näidisandmed |
+| `ToodedContext.cs` | DbSet-id, indeksid, seosed |
+| `Toode.cs`, `Klient.cs`, `Kasutaja.cs`, `Muuk.cs`, `Pakkumine.cs`, `Kategooria.cs` | andmemudelid |
+| `Sessioon.cs` | aktiivne kasutaja, rollid, BCrypt |
+| `LoginForm.cs`, `RegistreeriForm.cs`, `FormMain.cs` | sisselogimine ja peamenüü |
+| `Form2.cs` | ladu (omanik) |
+| `Form3.cs` | kliendi pood |
+| `KassaForm.cs` | kassa ja veebipood, `Maksa()` teeb ostu ühes transaktsioonis |
+| `Allahindlus.cs` | soodusloogika |
+| `StatistikaForm.cs` | statistika vorm ja tulpdiagramm |
+| `KliendidForm.cs`, `MuugidForm.cs`, `OstudForm.cs`, `PakkumisedForm.cs`, `OstunimekiriForm.cs` | muud vormid |
+| `Keel.cs` | tõlked ja keelevahetus |
+| `Teema.cs` | värvid (hele ja tume teema) ja paigutus |
+| `Epost.cs` | tšeki saatmine |
+
+## Paketid
+
+BCrypt.Net-Next 4.2.0, Microsoft.EntityFrameworkCore ja SqlServer 10.0.12, PdfSharpCore 1.3.67.
+
+## E-post
+
+Tšeki saatmiseks loo fail `%LOCALAPPDATA%\ToodedApp\epost.txt`: esimesel real Gmaili aadress, teisel rakenduse parool (App password).
